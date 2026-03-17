@@ -544,7 +544,7 @@
       padding: 36px 40px;
       background: #ffffff;
       position: relative;
-      overflow: hidden;
+      overflow: visible;   /* ← change from hidden to visible */
       transition: all 0.3s ease;
       margin-bottom: 24px;
       box-shadow: 0 2px 20px rgba(139, 69, 19, 0.06);
@@ -633,11 +633,12 @@
     }
 
     /* photo inside experience card */
-    .exp-photo-wrapper {
+      .exp-photo-wrapper {
       margin-top: 28px;
       display: flex;
       align-items: center;
       gap: 16px;
+      overflow: visible;   /* ← add this line */
     }
 
     .exp-photo {
