@@ -15,16 +15,16 @@
        COLOR VARIABLES — edit all your colors here in one place
     ============================================================ */
     :root {
-      --bg:           #ffffff;
-      --bg2:          #fdf6f0;
-      --surface:      #fff8f3;
-      --surface2:     #fdeee3;
-      --accent:       #8b4513;
-      --accent2:      #a0522d;
-      --accent3:      #cd853f;
-      --text:         #2b1200;
-      --text-muted:   #5c3317;
-      --text-dim:     #b07850;
+      --bg:           #ffffff;       /* main section background    */
+      --bg2:          #fdf6f0;       /* alternate section background */
+      --surface:      #fff8f3;       /* card background            */
+      --surface2:     #fdeee3;       /* card background variant    */
+      --accent:       #8b4513;       /* saddle brown — main color  */
+      --accent2:      #a0522d;       /* sienna — secondary color   */
+      --accent3:      #cd853f;       /* tan — third color          */
+      --text:         #2b1200;       /* primary text               */
+      --text-muted:   #5c3317;       /* body / description text    */
+      --text-dim:     #b07850;       /* dates, labels, footer      */
       --border:       rgba(139, 69, 19, 0.25);
       --border2:      rgba(139, 69, 19, 0.18);
       --glow:         rgba(139, 69, 19, 0.12);
@@ -84,7 +84,7 @@
 
 
     /* ============================================================
-       STAR FIELD CANVAS
+       STAR FIELD CANVAS (background)
     ============================================================ */
     canvas#stars {
       position: fixed;
@@ -138,6 +138,7 @@
       position: relative;
     }
 
+    /* underline animation on hover */
     .nav-links a::after {
       content: '';
       position: absolute;
@@ -149,12 +150,17 @@
       transition: width 0.3s;
     }
 
-    .nav-links a:hover { color: var(--accent); }
-    .nav-links a:hover::after { width: 100%; }
+    .nav-links a:hover {
+      color: var(--accent);
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
 
 
     /* ============================================================
-       SHARED
+       SHARED — all sections sit above the canvas
     ============================================================ */
     section {
       position: relative;
@@ -185,6 +191,7 @@
       width: 100%;
     }
 
+    /* "Available May 2026" pill badge */
     .hero-badge {
       display: inline-flex;
       align-items: center;
@@ -201,6 +208,7 @@
       margin-bottom: 24px;
     }
 
+    /* pulsing green dot inside badge */
     .hero-badge .dot {
       width: 6px;
       height: 6px;
@@ -209,59 +217,12 @@
       animation: pulse 2s infinite;
     }
 
-    /* tooltip shown when hovering over Kosmosliebhaberin */
-    .badge-word {
-      position: relative;
-      cursor: default;
-    }
-
-    .badge-word::after {
-      content: 'Lover of the Cosmos';
-      position: absolute;
-      bottom: calc(100% + 10px);
-      left: 50%;
-      transform: translateX(-50%) translateY(4px);
-      background: var(--accent);
-      color: #ffffff;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.68rem;
-      letter-spacing: 0.08em;
-      white-space: nowrap;
-      padding: 6px 14px;
-      border-radius: 6px;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.25s ease, transform 0.25s ease;
-    }
-
-    /* small downward pointing arrow under tooltip */
-    .badge-word::before {
-      content: '';
-      position: absolute;
-      bottom: calc(100% + 4px);
-      left: 50%;
-      transform: translateX(-50%);
-      border: 5px solid transparent;
-      border-top-color: var(--accent);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.25s ease;
-    }
-
-    .badge-word:hover::after {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-
-    .badge-word:hover::before {
-      opacity: 1;
-    }
-
     @keyframes pulse {
       0%, 100% { opacity: 1; transform: scale(1); }
       50%       { opacity: 0.4; transform: scale(0.7); }
     }
 
+    /* large name heading */
     .hero-name {
       font-family: 'Syne', sans-serif;
       font-weight: 800;
@@ -272,6 +233,7 @@
       margin-bottom: 8px;
     }
 
+    /* "Kaur" — outlined/stroke style */
     .hero-name .accent-line {
       display: block;
       color: transparent;
@@ -306,6 +268,7 @@
       flex-wrap: wrap;
     }
 
+    /* solid saddle brown button */
     .btn-primary {
       display: inline-flex;
       align-items: center;
@@ -329,6 +292,7 @@
       box-shadow: 0 12px 40px rgba(139, 69, 19, 0.25);
     }
 
+    /* outline button */
     .btn-secondary {
       display: inline-flex;
       align-items: center;
@@ -353,7 +317,7 @@
 
 
     /* ============================================================
-       SATELLITE EMBED
+       SATELLITE TRACKER EMBED (hero right side)
     ============================================================ */
     .hero-visual {
       position: relative;
@@ -363,6 +327,7 @@
       height: auto;
     }
 
+    /* "Live Project" label above iframe */
     .satellite-embed-label {
       display: inline-flex;
       align-items: center;
@@ -382,6 +347,7 @@
       animation: pulse 2s infinite;
     }
 
+    /* the embedded iframe */
     .satellite-iframe {
       width: 100%;
       height: 400px;
@@ -391,6 +357,7 @@
       background: #000;
     }
 
+    /* "Open Full Screen" link below iframe */
     .satellite-open-btn {
       align-self: flex-end;
       font-family: 'DM Mono', monospace;
@@ -425,6 +392,7 @@
       margin-bottom: 60px;
     }
 
+    /* e.g. "01 — Education" brown pill */
     .section-tag {
       font-family: 'DM Mono', monospace;
       font-size: 0.7rem;
@@ -438,6 +406,7 @@
       white-space: nowrap;
     }
 
+    /* horizontal line after section tag */
     .section-line {
       flex: 1;
       height: 1px;
@@ -486,6 +455,7 @@
       gap: 8px;
     }
 
+    /* individual course chip */
     .edu-chip {
       font-family: 'DM Mono', monospace;
       font-size: 0.68rem;
@@ -501,6 +471,7 @@
       text-align: right;
     }
 
+    /* large "May 2026" graduation date */
     .edu-grad-date {
       font-family: 'Syne', sans-serif;
       font-weight: 800;
@@ -538,6 +509,7 @@
       box-shadow: 0 2px 20px rgba(139, 69, 19, 0.06);
     }
 
+    /* left accent stripe */
     .exp-card::before {
       content: '';
       position: absolute;
@@ -579,6 +551,7 @@
       margin-top: 4px;
     }
 
+    /* date pill on the right */
     .exp-period {
       font-family: 'DM Mono', monospace;
       font-size: 0.72rem;
@@ -604,6 +577,7 @@
       line-height: 1.65;
     }
 
+    /* brown arrow bullet */
     .exp-points li::before {
       content: '▸';
       position: absolute;
@@ -617,39 +591,9 @@
       font-weight: 600;
     }
 
-    /* photo block inside experience card */
-    .exp-photo-wrapper {
-      margin-top: 28px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .exp-photo {
-      display: block;
-      width: 120px;
-      height: 120px;
-      object-fit: cover;
-      object-position: center;
-      border-radius: 16px;
-      border: 2px solid rgba(139, 69, 19, 0.2);
-      box-shadow: 0 4px 16px rgba(139, 69, 19, 0.12);
-      flex-shrink: 0;
-    }
-
-    .exp-photo-caption {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.68rem;
-      color: var(--text-dim);
-      letter-spacing: 0.08em;
-      line-height: 1.6;
-    }
-
 
     /* ============================================================
-       RESEARCH SECTION — INTERACTIVE CARDS
-       Cards show only summary info by default.
-       Clicking expands to reveal the full description.
+       RESEARCH SECTION
     ============================================================ */
     #research {
       background: var(--bg2);
@@ -661,7 +605,6 @@
       gap: 24px;
     }
 
-    /* the card itself — cursor pointer since it's clickable */
     .research-card {
       background: #ffffff;
       border: 1px solid var(--border2);
@@ -669,11 +612,11 @@
       padding: 30px;
       position: relative;
       overflow: hidden;
-      cursor: pointer;
-      transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+      transition: all 0.3s ease;
       box-shadow: 0 2px 16px rgba(139, 69, 19, 0.05);
     }
 
+    /* subtle glow in top-right corner */
     .research-card::after {
       content: '';
       position: absolute;
@@ -691,13 +634,7 @@
       box-shadow: 0 16px 40px rgba(139, 69, 19, 0.1);
     }
 
-    /* when card is open (description visible) */
-    .research-card.open {
-      border-color: rgba(139, 69, 19, 0.4);
-      box-shadow: 0 12px 40px rgba(139, 69, 19, 0.12);
-      transform: translateY(0);
-    }
-
+    /* emoji icon box */
     .research-icon {
       width: 44px;
       height: 44px;
@@ -711,6 +648,7 @@
       margin-bottom: 20px;
     }
 
+    /* e.g. "NASA · RASC-AL" pill */
     .research-tag {
       display: inline-block;
       font-family: 'DM Mono', monospace;
@@ -731,16 +669,16 @@
       font-size: 1.05rem;
       color: var(--text);
       line-height: 1.4;
-      margin-bottom: 8px;
+      margin-bottom: 12px;
     }
 
-    .research-role {
+        .research-role {
       font-family: 'Syne', sans-serif;
       font-weight: 500;
       font-size: 0.9rem;
-      color: var(--text-muted);
+      color: var(--text);
       line-height: 1.4;
-      margin-bottom: 8px;
+      margin-bottom: 12px;
     }
 
     .research-org {
@@ -748,54 +686,13 @@
       font-size: 0.72rem;
       color: var(--accent2);
       letter-spacing: 0.08em;
-      margin-bottom: 0;
+      margin-bottom: 14px;
     }
 
-    /* "Click to read more" hint shown when card is closed */
-    .research-hint {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
-      color: var(--text-dim);
-      letter-spacing: 0.08em;
-      margin-top: 14px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: color 0.2s;
-    }
-
-    .research-hint::before {
-      content: '▸';
-      font-size: 0.6rem;
-      transition: transform 0.3s ease;
-    }
-
-    /* arrow flips when open */
-    .research-card.open .research-hint::before {
-      transform: rotate(90deg);
-    }
-
-    .research-card.open .research-hint {
-      color: var(--accent);
-    }
-
-    /* description — hidden by default, slides open on click */
     .research-desc {
       font-size: 0.88rem;
       line-height: 1.7;
       color: var(--text-muted);
-      max-height: 0;
-      overflow: hidden;
-      opacity: 0;
-      margin-top: 0;
-      transition: max-height 0.45s ease, opacity 0.35s ease, margin-top 0.3s ease;
-    }
-
-    /* when card is open, description expands */
-    .research-card.open .research-desc {
-      max-height: 600px;
-      opacity: 1;
-      margin-top: 16px;
     }
 
     .research-desc strong {
@@ -806,7 +703,6 @@
 
     /* ============================================================
        SKILLS SECTION
-       Note: hover color change removed — tags are static
     ============================================================ */
     #skills {
       background: var(--bg);
@@ -832,6 +728,7 @@
       box-shadow: 0 8px 30px rgba(139, 69, 19, 0.1);
     }
 
+    /* category title e.g. "Modeling & Design" */
     .skill-group-title {
       font-family: 'DM Mono', monospace;
       font-size: 0.7rem;
@@ -844,6 +741,7 @@
       gap: 8px;
     }
 
+    /* short line before category title */
     .skill-group-title::before {
       content: '';
       width: 18px;
@@ -857,7 +755,7 @@
       gap: 8px;
     }
 
-    /* skill pill — NO hover color change */
+    /* individual skill pill */
     .skill-tag {
       font-family: 'DM Mono', monospace;
       font-size: 0.72rem;
@@ -867,6 +765,14 @@
       border-radius: 4px;
       padding: 5px 11px;
       letter-spacing: 0.05em;
+      transition: all 0.2s;
+    }
+
+    /* hover fills the pill brown with white text */
+    .skill-tag:hover {
+      color: #ffffff;
+      background: var(--accent);
+      border-color: var(--accent);
     }
 
 
@@ -900,6 +806,7 @@
       box-shadow: 0 16px 40px rgba(139, 69, 19, 0.1);
     }
 
+    /* large faded number in the corner */
     .project-num {
       font-family: 'Syne', sans-serif;
       font-weight: 800;
@@ -957,6 +864,7 @@
       border-bottom: 1px solid rgba(139, 69, 19, 0.1);
     }
 
+    /* vertical brown gradient line on left */
     .lead-line {
       width: 3px;
       height: 100%;
@@ -987,6 +895,7 @@
       line-height: 1.65;
     }
 
+    /* date on the right */
     .lead-period {
       font-family: 'DM Mono', monospace;
       font-size: 0.68rem;
@@ -1022,6 +931,7 @@
       color: var(--accent);
     }
 
+    /* "Connect" — outlined stroke style */
     .contact-heading .stroke {
       color: transparent;
       -webkit-text-stroke: 1.5px var(--accent);
@@ -1058,6 +968,7 @@
       box-shadow: 0 2px 12px rgba(139, 69, 19, 0.06);
     }
 
+    /* hover fills button brown */
     .contact-link:hover {
       color: #ffffff;
       background: var(--accent);
@@ -1099,6 +1010,7 @@
 
     /* ============================================================
        SCROLL REVEAL ANIMATION
+       Elements with class "reveal" fade in when scrolled into view
     ============================================================ */
     .reveal {
       opacity: 0;
@@ -1170,7 +1082,7 @@
       <div>
         <div class="hero-badge">
           <span class="dot"></span>
-          <span class="badge-word">Kosmosliebhaberin</span>
+          Selenophile
         </div>
 
         <h1 class="hero-name">
@@ -1184,9 +1096,9 @@
           Undergraduate Aerospace Engineer with research experience in
           <strong>aeroacoustics, systems integration</strong>, and
           <strong>futuristic aerospace technologies</strong>. Led collaborative
-          research with <strong>Honeywell Aerospace</strong> on APU noise reduction and acoustic liner design.
+          research with <strong>Honeywell Aerospace</strong> on APU noise reduction and acoustic liner design
           Built systems verification and flight management systems expertise through work at
-          <strong>Collins Aerospace / RTX Corporation</strong>.
+          <strong>Collins Aerospace/RTX Corporation</strong>.
         </p>
 
         <div class="hero-cta">
@@ -1199,7 +1111,7 @@
       <div class="hero-visual">
         <div class="satellite-embed-label">
           <span class="dot"></span>
-          Live 3D Satellite Orbit Tracker
+          Live Project — 3D Satellite Orbit Tracker
         </div>
 
         <iframe
@@ -1211,7 +1123,7 @@
         ></iframe>
 
         <a href="satellite/index.html" target="_blank" class="satellite-open-btn">
-          View in New Tab ↗
+          View in Full Screen ↗
         </a>
       </div>
 
@@ -1300,14 +1212,13 @@
             autonomous decision logic.
           </li>
         </ul>
+      </div>
+      </ul>
 
-        <!-- Your photo — replace me.jpg with your actual filename -->
+        <!-- Your photo -->
         <div class="exp-photo-wrapper">
           <img src="me.jpg" alt="Harjot Kaur at Collins Aerospace" class="exp-photo" />
-          <p class="exp-photo-caption">
-            At Collins Aerospace<br/>
-            Cedar Rapids, IA
-          </p>
+          <p class="exp-photo-caption">At Collins Aerospace</br> Cedar Rapids, IA</p>
         </div>
 
       </div>
@@ -1315,11 +1226,11 @@
     </div>
   </section>
 
+ 
+
 
   <!-- ============================================================
        RESEARCH
-       Each card shows: emoji, title, affiliation tag, role, date
-       Click any card to expand and read the full description
   ============================================================ -->
   <section id="research">
     <div class="section-inner">
@@ -1331,119 +1242,104 @@
 
       <div class="research-grid">
 
-        <!-- Card 1: NASA RASC-AL -->
-        <div class="research-card reveal" onclick="toggleCard(this)">
+        <div class="research-card reveal">
           <div class="research-icon">🛰️</div>
           <span class="research-tag">NASA · RASC-AL</span>
           <div class="research-title">Lunar Sampling Rover</div>
-          <div class="research-role">Structural & Communication Lead</div>
+          <div class="research-role"> Structure & communication Lead</div>
           <div class="research-org">Fall 2025 – Present</div>
-          <div class="research-hint">Click to read more</div>
           <div class="research-desc">
-            Led the rover structural design, subsystem integration, and communication
-            architecture to enable reliable telemetry and mission operations for a lunar
-            surface sampling rover developed for a NASA RASC-AL mission concept.
-            Developed the <strong>Lunar Isolation Sample Container (LISC)</strong>, a concept
-            for lunar sample preservation featuring a dual-wall aluminum structure, vacuum
-            insulation, and thermal interfaces designed to maintain volatile stability and
-            structural integrity of collected samples. Additionally led system-level design,
-            CAD modeling, and trade studies for sampling mechanisms, container architecture,
-            and autonomous rover–ascent vehicle sample transfer operations.
+            Led the rover structural design, subsystem integration, and communication architecture 
+            to enable reliable telemetry and mission operations for a lunar surface sampling rover developed 
+            for a NASA RASC-AL mission concept. Developed the </strong>Lunar Isolation Sample Container (LISC)</strong>, a 
+            concept for lunar sample preservation featuring a dual-wall aluminum structure, vacuum insulation,
+            and thermal interfaces designed to maintain volatile stability and structural integrity of 
+            collected samples. Additionally led system-level design, CAD modeling, and trade studies for 
+            sampling mechanisms, container architecture, and autonomous rover–ascent vehicle sample transfer 
+            operations.
+
           </div>
         </div>
 
-        <!-- Card 2: Honeywell -->
-        <div class="research-card reveal" onclick="toggleCard(this)">
+        <div class="research-card reveal">
           <div class="research-icon">🔊</div>
           <span class="research-tag">Honeywell Aerospace</span>
           <div class="research-title">APU Noise Reduction & Acoustic Liner Design</div>
-          <div class="research-role">Project Lead & Project Manager</div>
+          <div class="research-role">Project Lead & project Manager</div>
           <div class="research-org">Spring 2025 – Fall 2025</div>
-          <div class="research-hint">Click to read more</div>
           <div class="research-desc">
-            Conducted joint research with <strong>Honeywell Aerospace</strong> on Auxiliary
-            Power Unit (APU) noise mitigation, exploring both active and passive acoustic
-            technologies for liner optimization. Performed preliminary frequency-domain
-            analysis and source identification to characterize key APU noise contributors,
-            and collaborated with Honeywell engineers to investigate suitable material
-            selections and liner geometry configurations aimed at improving acoustic
-            absorption and overall noise reduction performance.
+            Conducted joint research with </strong>Honeywell Aerospace</strong> on Auxiliary Power Unit (APU) noise mitigation, 
+            exploring both active and passive acoustic technologies for liner optimization. 
+            Performed preliminary frequency-domain analysis and source identification to characterize 
+            key APU noise contributors, and collaborated with Honeywell engineers to investigate 
+            suitable material selections and liner geometry configurations aimed at improving acoustic absorption 
+            and overall noise reduction performance.
           </div>
         </div>
 
-        <!-- Card 3: Cube Sounder -->
-        <div class="research-card reveal" onclick="toggleCard(this)">
+        <div class="research-card reveal">
           <div class="research-icon">📡</div>
           <span class="research-tag">ASU · Systems Engineering</span>
           <div class="research-title">Cube Sounder Balloon Mission</div>
-          <div class="research-role">Systems Engineer — Led Comms</div>
+          <div class="research-role">Systems Engineer - Led comms</div>
           <div class="research-org">Spring 2025</div>
-          <div class="research-hint">Click to read more</div>
           <div class="research-desc">
-            Defined the telecommunications and ground data subsystems while ensuring
-            compliance with NASA standards and maintaining traceability to SMART
-            requirements. Prepared and delivered <strong>System Requirements Review (SRR)</strong>
-            and <strong>Preliminary Design Review (PDR)</strong> documentation aligned with
-            mission objectives, and applied established systems engineering principles to
-            integrate payload data routing and develop a robust, reliable communication
+            Defined the telecommunications and ground data subsystems while ensuring compliance 
+            with NASA standards and maintaining traceability to SMART requirements. 
+            Prepared and delivered </strong>System Requirements Review (SRR)</strong> and </strong>Preliminary Design Review (PDR)</strong>
+            documentation aligned with mission objectives, and applied established systems engineering 
+            principles to integrate payload data routing and develop a robust, reliable communication 
             architecture.
+
           </div>
         </div>
 
-        <!-- Card 4: Space Works II -->
-        <div class="research-card reveal" onclick="toggleCard(this)">
+        <div class="research-card reveal">
           <div class="research-icon">📷</div>
           <span class="research-tag">ASU · Space Works II</span>
           <div class="research-title">Planetary Infrared Camera Shielding System</div>
-          <div class="research-role">Deputy Project Manager</div>
+          <div class="research-role"> Deputy Project Manager</div>
           <div class="research-org">Spring 2025</div>
-          <div class="research-hint">Click to read more</div>
           <div class="research-desc">
-            Designed a shielding system for a planetary observation payload by integrating
-            environmental sensors with an Arduino-based control system to protect
-            instrumentation from dust and radiation exposure. Utilized <strong>GD&T
-            principles</strong> and <strong>Siemens NX</strong> for mechanical design of
-            the housing and integration components. Coordinated subsystem testing and
-            electrical assembly, including soldering and hardware integration, to verify
-            operational integrity and successfully delivered both Preliminary Design Review
-            (PDR) and Critical Design Review (CDR) documentation.
+            Designed a shielding system for a planetary observation payload by integrating 
+            environmental sensors with an Arduino-based control system to protect instrumentation 
+            from dust and radiation exposure. Utilized </strong>GD&T principles</strong> and </strong>Siemens NX</strong> for mechanical 
+            design of the housing and integration components, ensuring manufacturability and precise 
+            subsystem interfaces. Coordinated subsystem testing and electrical assembly, including 
+            soldering and hardware integration, to verify operational integrity and successfully 
+            delivered both Preliminary Design Review (PDR) and Critical Design Review (CDR) 
+            documentation.
           </div>
         </div>
 
-        <!-- Card 5: Space Works I -->
-        <div class="research-card reveal" onclick="toggleCard(this)">
+        <div class="research-card reveal">
           <div class="research-icon">🚀</div>
           <span class="research-tag">ASU · Space Works I</span>
-          <div class="research-title">Planetary Lander — Structural Design</div>
-          <div class="research-role">ATLO Lead & Safety Engineer</div>
+          <div class="research-title">Planetary Lander - Structural Design</div>
+          <div class="research-role">ATLO Lead and Safety Engineer</div>
           <div class="research-org">Fall 2024</div>
-          <div class="research-hint">Click to read more</div>
           <div class="research-desc">
-            Designed a conceptual planetary lander to meet specified mission constraints
-            while ensuring tolerance to impact forces under varying landing conditions.
-            Served as Safety Engineer and Assembly, Test, and Launch Operations Lead,
-            overseeing procedures to maintain system safety, reliability, and mission
-            readiness. Conducted analytical assessments to determine the appropriate mass,
-            volume, and dimensional parameters required for a stable and successful landing
-            profile, and performed pre-launch tests and simulations to validate the
-            lander's functional performance and structural integrity.
+            Designed a conceptual planetary lander to meet specified mission constraints while 
+            ensuring tolerance to impact forces under varying landing conditions. 
+            Served as Safety Engineer and Assembly, Test, and Launch Operations Lead, overseeing 
+            procedures to maintain system safety, reliability, and mission readiness. Conducted 
+            analytical assessments to determine the appropriate mass, volume, and dimensional 
+            parameters required for a stable and successful landing profile, and performed pre-launch 
+            tests and simulations to validate the lander’s functional performance and structural 
+            integrity prior to mission deployment.
           </div>
         </div>
 
-        <!-- Card 6: EPICS -->
-        <div class="research-card reveal" onclick="toggleCard(this)">
+        <div class="research-card reveal">
           <div class="research-icon">🌱</div>
           <span class="research-tag">ASU · EPICS</span>
           <div class="research-title">Vietnam Smart Agriculture Project</div>
           <div class="research-role">Documentation Lead</div>
           <div class="research-org">Fall 2022</div>
-          <div class="research-hint">Click to read more</div>
           <div class="research-desc">
-            Designed a pH sensor model for soil monitoring with Arduino-based data
+            Designed pH sensor model for soil monitoring with Arduino-based data
             collection. Led documentation and software development for real-time
-            irrigation data in a 7-member international project. Collaborated to develop
-            a team scope, divide effort, and ensure timely completion aligned with
-            project goals.
+            irrigation data in a 7-member international project.
           </div>
         </div>
 
@@ -1666,8 +1562,8 @@
         </p>
 
         <div class="contact-links">
-          <a href="/cdn-cgi/l/email-protection#264d475354084e47544c4952081710141766414b474f4a0845494b" class="contact-link">
-            <span class="icon">✉</span> <span class="__cf_email__" data-cfemail="2f47444e5a5d1c1c6f4e5c5a014a4b5a">[email&#160;protected]</span>
+          <a href="mailto:kaur.harjot.1621@gmail.com" class="contact-link">
+            <span class="icon">✉</span> hkaur33@asu.edu
           </a>
           <a href="https://www.linkedin.com/in/harjottkaurr/" target="_blank" class="contact-link">
             <span class="icon">🔗</span> LinkedIn
@@ -1683,7 +1579,7 @@
        FOOTER
   ============================================================ -->
   <footer>
-    <p>© <span class="footer-accent">Harjot Kaur</span> — Aerospace Engineer</p>
+    <p>©<span class="footer-accent">Harjot Kaur</span> — Aerospace Engineer</p>
     <p>Arizona State University · Tempe, AZ</p>
   </footer>
 
@@ -1691,7 +1587,7 @@
   <!-- ============================================================
        JAVASCRIPT
   ============================================================ -->
-  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  <script>
 
     /* ── Custom cursor ── */
     const cursor = document.getElementById('cursor');
@@ -1712,29 +1608,11 @@
     }
     animCursor();
 
+    /* ring grows slightly when hovering links */
     document.querySelectorAll('a, button').forEach(el => {
       el.addEventListener('mouseenter', () => { ring.style.opacity = '0.9'; });
       el.addEventListener('mouseleave', () => { ring.style.opacity = '0.5'; });
     });
-
-
-    /* ── Research card toggle ──
-       Clicking a card adds/removes the "open" class.
-       CSS handles the smooth expand/collapse animation.
-       The hint text also updates to reflect the current state.
-    ── */
-    function toggleCard(card) {
-      const isOpen = card.classList.contains('open');
-      const hint   = card.querySelector('.research-hint');
-
-      if (isOpen) {
-        card.classList.remove('open');
-        hint.textContent = 'Click to read more';
-      } else {
-        card.classList.add('open');
-        hint.textContent = 'Click to collapse';
-      }
-    }
 
 
     /* ── Star field ── */
@@ -1749,6 +1627,7 @@
     resize();
     window.addEventListener('resize', resize);
 
+    /* create 180 random stars */
     for (let i = 0; i < 180; i++) {
       stars.push({
         x:     Math.random() * 2000,
@@ -1775,7 +1654,20 @@
 
 
     /* ── Scroll reveal ── */
-    const reveals  = document.querySelectorAll('.reveal');
+    /* when a .reveal element enters the viewport, add .visible to fade it in */
+    const reveals = document.querySelectorAll('.reveal');
     const observer = new IntersectionObserver(entries => {
       entries.forEach((entry, i) => {
         if (entry.isIntersecting) {
+          setTimeout(() => entry.target.classList.add('visible'), i * 80);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    reveals.forEach(r => observer.observe(r));
+
+  </script>
+
+</body>
+</html>
