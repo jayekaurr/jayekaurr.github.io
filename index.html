@@ -12,19 +12,19 @@
   <style>
 
     /* ============================================================
-       COLOR VARIABLES — edit all your colors here in one place
+       COLOR VARIABLES — change your colors here in one place
     ============================================================ */
     :root {
-      --bg:           #ffffff;
-      --bg2:          #fdf6f0;
-      --surface:      #fff8f3;
-      --surface2:     #fdeee3;
-      --accent:       #8b4513;
-      --accent2:      #a0522d;
-      --accent3:      #cd853f;
-      --text:         #2b1200;
-      --text-muted:   #5c3317;
-      --text-dim:     #b07850;
+      --bg:           #ffffff;       /* main background              */
+      --bg2:          #fdf6f0;       /* alternate section background */
+      --surface:      #fff8f3;       /* card background              */
+      --surface2:     #fdeee3;       /* card background variant      */
+      --accent:       #8b4513;       /* saddle brown — main color    */
+      --accent2:      #a0522d;       /* sienna — secondary           */
+      --accent3:      #cd853f;       /* tan — third accent           */
+      --text:         #2b1200;       /* primary text                 */
+      --text-muted:   #5c3317;       /* body / description text      */
+      --text-dim:     #b07850;       /* dates, labels, footer        */
       --border:       rgba(139, 69, 19, 0.25);
       --border2:      rgba(139, 69, 19, 0.18);
       --glow:         rgba(139, 69, 19, 0.12);
@@ -84,7 +84,7 @@
 
 
     /* ============================================================
-       STAR FIELD CANVAS
+       STAR FIELD CANVAS (background)
     ============================================================ */
     canvas#stars {
       position: fixed;
@@ -123,13 +123,13 @@
 
     .nav-links {
       display: flex;
-      gap: 36px;
+      gap: 28px;
       list-style: none;
     }
 
     .nav-links a {
       font-family: 'DM Mono', monospace;
-      font-size: 0.78rem;
+      font-size: 0.72rem;
       color: var(--text-muted);
       text-decoration: none;
       letter-spacing: 0.1em;
@@ -138,7 +138,7 @@
       position: relative;
     }
 
-    /* underline animation on hover */
+    /* underline slide-in on hover */
     .nav-links a::after {
       content: '';
       position: absolute;
@@ -150,13 +150,16 @@
       transition: width 0.3s;
     }
 
-    .nav-links a:hover { color: var(--accent); }
-    .nav-links a:hover::after { width: 100%; }
+    .nav-links a:hover {
+      color: var(--accent);
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
 
 
-    /* ============================================================
-       SHARED
-    ============================================================ */
+    /* all sections sit above the canvas */
     section {
       position: relative;
       z-index: 1;
@@ -186,7 +189,7 @@
       width: 100%;
     }
 
-    /* pill badge */
+    /* "Kosmosliebhaberin" pill badge */
     .hero-badge {
       display: inline-flex;
       align-items: center;
@@ -212,13 +215,17 @@
       animation: pulse 2s infinite;
     }
 
-    /* ── Kosmosliebhaberin tooltip ── */
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.4; transform: scale(0.7); }
+    }
+
+    /* tooltip appears when hovering over "Kosmosliebhaberin" */
     .badge-word {
       position: relative;
       cursor: default;
     }
 
-    /* "Lover of the Cosmos" tooltip — hidden by default */
     .badge-word::after {
       content: 'Lover of the Cosmos';
       position: absolute;
@@ -263,12 +270,7 @@
       opacity: 1;
     }
 
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50%       { opacity: 0.4; transform: scale(0.7); }
-    }
-
-    /* large name heading */
+    /* large name */
     .hero-name {
       font-family: 'Syne', sans-serif;
       font-weight: 800;
@@ -279,7 +281,7 @@
       margin-bottom: 8px;
     }
 
-    /* "Kaur" outlined stroke */
+    /* "Kaur" — outlined/stroke style */
     .hero-name .accent-line {
       display: block;
       color: transparent;
@@ -363,7 +365,7 @@
 
 
     /* ============================================================
-       SATELLITE TRACKER EMBED
+       SATELLITE TRACKER EMBED (hero right side)
     ============================================================ */
     .hero-visual {
       position: relative;
@@ -449,11 +451,132 @@
       white-space: nowrap;
     }
 
-    /* horizontal line after section tag */
+    /* horizontal fading line after section tag */
     .section-line {
       flex: 1;
       height: 1px;
       background: linear-gradient(to right, rgba(139, 69, 19, 0.3), transparent);
+    }
+
+
+    /* ============================================================
+       HIGHLIGHTS STRIP
+       Sits between hero and education.
+       Shows key partnerships and accomplishments at a glance.
+    ============================================================ */
+    #highlights {
+      background: var(--bg);
+      border-top: 1px solid rgba(139, 69, 19, 0.08);
+      border-bottom: 1px solid rgba(139, 69, 19, 0.08);
+      position: relative;
+      z-index: 1;
+    }
+
+    .highlights-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 56px 60px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+    }
+
+    /* each card — divider lines between them via border-right */
+    .highlight-card {
+      padding: 32px 36px;
+      border-right: 1px solid rgba(139, 69, 19, 0.12);
+      position: relative;
+      transition: background 0.25s ease;
+    }
+
+    .highlight-card:last-child {
+      border-right: none;
+    }
+
+    .highlight-card:hover {
+      background: var(--surface);
+    }
+
+    /* colored top-edge accent bar — each card gets its own shade */
+    .highlight-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 36px;
+      right: 36px;
+      height: 2px;
+      border-radius: 0 0 2px 2px;
+    }
+
+    .highlight-card:nth-child(1)::before { background: var(--accent); }
+    .highlight-card:nth-child(2)::before { background: var(--accent2); }
+    .highlight-card:nth-child(3)::before { background: var(--accent3); }
+    .highlight-card:nth-child(4)::before { background: rgba(139, 69, 19, 0.35); }
+
+    /* category label e.g. "Industry" */
+    .hl-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      color: var(--text-dim);
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    /* main bold title */
+    .hl-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.15rem;
+      color: var(--text);
+      line-height: 1.2;
+      margin-bottom: 6px;
+    }
+
+    /* subtitle */
+    .hl-sub {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 18px;
+    }
+
+    /* small keyword tags at the bottom */
+    .hl-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .hl-tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      color: var(--text-muted);
+      background: rgba(139, 69, 19, 0.06);
+      border: 1px solid rgba(139, 69, 19, 0.14);
+      border-radius: 4px;
+      padding: 3px 8px;
+      letter-spacing: 0.04em;
+    }
+
+    /* responsive: 2 columns on medium screens */
+    @media (max-width: 900px) {
+      .highlights-inner {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .highlight-card:nth-child(2) {
+        border-right: none;
+      }
+
+      .highlight-card:nth-child(3) {
+        border-right: 1px solid rgba(139, 69, 19, 0.12);
+        border-top: 1px solid rgba(139, 69, 19, 0.12);
+      }
+
+      .highlight-card:nth-child(4) {
+        border-top: 1px solid rgba(139, 69, 19, 0.12);
+      }
     }
 
 
@@ -498,6 +621,7 @@
       gap: 8px;
     }
 
+    /* each course/subject chip */
     .edu-chip {
       font-family: 'DM Mono', monospace;
       font-size: 0.68rem;
@@ -513,6 +637,7 @@
       text-align: right;
     }
 
+    /* large "May 2026" date */
     .edu-grad-date {
       font-family: 'Syne', sans-serif;
       font-weight: 800;
@@ -544,7 +669,7 @@
       padding: 36px 40px;
       background: #ffffff;
       position: relative;
-      overflow: visible;   /* ← change from hidden to visible */
+      overflow: visible;
       transition: all 0.3s ease;
       margin-bottom: 24px;
       box-shadow: 0 2px 20px rgba(139, 69, 19, 0.06);
@@ -592,7 +717,7 @@
       margin-top: 4px;
     }
 
-    /* date pill */
+    /* date pill on the right */
     .exp-period {
       font-family: 'DM Mono', monospace;
       font-size: 0.72rem;
@@ -633,12 +758,12 @@
     }
 
     /* photo inside experience card */
-      .exp-photo-wrapper {
+    .exp-photo-wrapper {
       margin-top: 28px;
       display: flex;
       align-items: center;
       gap: 16px;
-      overflow: visible;   /* ← add this line */
+      overflow: visible;
     }
 
     .exp-photo {
@@ -652,7 +777,6 @@
       box-shadow: 0 4px 16px rgba(139, 69, 19, 0.12);
       flex-shrink: 0;
     }
-        
 
     .exp-photo-caption {
       font-family: 'DM Mono', monospace;
@@ -664,9 +788,9 @@
 
 
     /* ============================================================
-       RESEARCH SECTION — INTERACTIVE CLICK-TO-EXPAND CARDS
-       Default: shows emoji, title, tag, role, date
-       On click: description smoothly expands below
+       RESEARCH SECTION — INTERACTIVE CLICK-TO-EXPAND
+       Default: emoji, title, tag, role, date
+       Click: description slides open
     ============================================================ */
     #research {
       background: var(--bg2);
@@ -709,7 +833,7 @@
       box-shadow: 0 16px 40px rgba(139, 69, 19, 0.1);
     }
 
-    /* card stays flat when open so description reads cleanly */
+    /* card stays flat when open */
     .research-card.open {
       border-color: rgba(139, 69, 19, 0.4);
       box-shadow: 0 12px 40px rgba(139, 69, 19, 0.12);
@@ -800,7 +924,7 @@
       color: var(--accent);
     }
 
-    /* description — collapsed by default */
+    /* description — collapsed by default, expands on click */
     .research-desc {
       font-size: 0.88rem;
       line-height: 1.7;
@@ -812,7 +936,6 @@
       transition: max-height 0.45s ease, opacity 0.35s ease, margin-top 0.3s ease;
     }
 
-    /* description expands when card has .open class */
     .research-card.open .research-desc {
       max-height: 600px;
       opacity: 1;
@@ -827,7 +950,6 @@
 
     /* ============================================================
        SKILLS SECTION
-       Hover color change removed — tags are static
     ============================================================ */
     #skills {
       background: var(--bg);
@@ -853,6 +975,7 @@
       box-shadow: 0 8px 30px rgba(139, 69, 19, 0.1);
     }
 
+    /* category heading e.g. "Modeling & Design" */
     .skill-group-title {
       font-family: 'DM Mono', monospace;
       font-size: 0.7rem;
@@ -865,6 +988,7 @@
       gap: 8px;
     }
 
+    /* short line before category title */
     .skill-group-title::before {
       content: '';
       width: 18px;
@@ -878,7 +1002,7 @@
       gap: 8px;
     }
 
-    /* skill pill — NO hover color change */
+    /* individual skill pill — no hover color change */
     .skill-tag {
       font-family: 'DM Mono', monospace;
       font-size: 0.72rem;
@@ -892,7 +1016,8 @@
 
 
     /* ============================================================
-       PROJECTS SECTION
+       PROJECTS SECTION — INTERACTIVE CLICK-TO-EXPAND
+       Same interaction pattern as research cards
     ============================================================ */
     #projects {
       background: var(--bg2);
@@ -904,6 +1029,7 @@
       gap: 24px;
     }
 
+    /* clickable project card */
     .project-card {
       background: #ffffff;
       border: 1px solid var(--border);
@@ -911,7 +1037,8 @@
       padding: 32px;
       position: relative;
       overflow: hidden;
-      transition: all 0.3s ease;
+      cursor: pointer;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
       box-shadow: 0 2px 16px rgba(139, 69, 19, 0.05);
     }
 
@@ -921,7 +1048,14 @@
       box-shadow: 0 16px 40px rgba(139, 69, 19, 0.1);
     }
 
-    /* large faded number in corner */
+    /* stays flat when open */
+    .project-card.open {
+      border-color: rgba(139, 69, 19, 0.4);
+      box-shadow: 0 12px 40px rgba(139, 69, 19, 0.12);
+      transform: translateY(0);
+    }
+
+    /* large faded number in the corner */
     .project-num {
       font-family: 'Syne', sans-serif;
       font-weight: 800;
@@ -950,10 +1084,50 @@
       margin-bottom: 14px;
     }
 
+    /* "▸ Click to read more" hint */
+    .project-hint {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      letter-spacing: 0.08em;
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s;
+    }
+
+    .project-hint::before {
+      content: '▸';
+      font-size: 0.6rem;
+      transition: transform 0.3s ease;
+    }
+
+    /* arrow rotates when open */
+    .project-card.open .project-hint::before {
+      transform: rotate(90deg);
+    }
+
+    .project-card.open .project-hint {
+      color: var(--accent);
+    }
+
+    /* description — collapsed by default, expands on click */
     .project-desc {
       font-size: 0.9rem;
       color: var(--text-muted);
       line-height: 1.7;
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      margin-top: 0;
+      transition: max-height 0.45s ease, opacity 0.35s ease, margin-top 0.3s ease;
+    }
+
+    .project-card.open .project-desc {
+      max-height: 400px;
+      opacity: 1;
+      margin-top: 14px;
     }
 
 
@@ -1046,6 +1220,7 @@
       color: var(--accent);
     }
 
+    /* "Connect" — outlined stroke style */
     .contact-heading .stroke {
       color: transparent;
       -webkit-text-stroke: 1.5px var(--accent);
@@ -1082,6 +1257,7 @@
       box-shadow: 0 2px 12px rgba(139, 69, 19, 0.06);
     }
 
+    /* hover fills button brown */
     .contact-link:hover {
       color: #ffffff;
       background: var(--accent);
@@ -1123,6 +1299,7 @@
 
     /* ============================================================
        SCROLL REVEAL ANIMATION
+       Elements with class "reveal" fade in when scrolled into view
     ============================================================ */
     .reveal {
       opacity: 0;
@@ -1157,6 +1334,9 @@
       .edu-card         { grid-template-columns: 1fr; }
       footer            { flex-direction: column; gap: 8px; text-align: center; }
       #hero             { padding: 100px 24px 60px; }
+      .highlights-inner { grid-template-columns: 1fr; padding: 32px 24px; }
+      .highlight-card   { border-right: none; border-bottom: 1px solid rgba(139, 69, 19, 0.12); }
+      .highlight-card:last-child { border-bottom: none; }
     }
 
   </style>
@@ -1174,6 +1354,7 @@
   <nav>
     <a href="#hero" class="nav-logo">:harj:</a>
     <ul class="nav-links">
+      <li><a href="#highlights">Highlights</a></li>
       <li><a href="#education">Education</a></li>
       <li><a href="#experience">Experience</a></li>
       <li><a href="#research">Research</a></li>
@@ -1194,7 +1375,6 @@
       <div>
         <div class="hero-badge">
           <span class="dot"></span>
-          <!-- Hover over to see translation -->
           <span class="badge-word">Kosmosliebhaberin</span>
         </div>
 
@@ -1209,8 +1389,9 @@
           Undergraduate Aerospace Engineer with research experience in
           <strong>aeroacoustics, systems integration</strong>, and
           <strong>futuristic aerospace technologies</strong>. Led collaborative
-          research with <strong>Honeywell Aerospace</strong> on APU noise reduction and acoustic liner design.
-          Built systems verification and flight management systems expertise through work at
+          research with <strong>Honeywell Aerospace</strong> on APU noise reduction
+          and acoustic liner design. Built systems verification and flight management
+          systems expertise through work at
           <strong>Collins Aerospace / RTX Corporation</strong>.
         </p>
 
@@ -1245,6 +1426,86 @@
 
 
   <!-- ============================================================
+       HIGHLIGHTS STRIP
+       Key partnerships and accomplishments at a glance.
+       Sits between hero and education.
+  ============================================================ -->
+  <section id="highlights">
+    <div class="highlights-inner">
+
+      <!-- Card 1: Collins Aerospace -->
+      <div class="highlight-card reveal">
+        <div class="hl-label">Industry</div>
+        <div class="hl-title">Collins Aerospace · RTX</div>
+        <div class="hl-sub">
+          Systems / Software Engineering Intern across 3 consecutive
+          summers, working on certified avionics software for
+          Bombardier &amp; Airbus aircraft.
+        </div>
+        <div class="hl-tags">
+          <span class="hl-tag">DO-178B</span>
+          <span class="hl-tag">FMS / HMI</span>
+          <span class="hl-tag">3× Internships</span>
+          <span class="hl-tag">Python Testing</span>
+        </div>
+      </div>
+
+      <!-- Card 2: Honeywell + NASA -->
+      <div class="highlight-card reveal">
+        <div class="hl-label">Research</div>
+        <div class="hl-title">Honeywell &amp; NASA</div>
+        <div class="hl-sub">
+          Led APU noise reduction research with Honeywell Aerospace
+          and spearheaded structural design for a lunar sampling
+          rover in NASA RASC-AL.
+        </div>
+        <div class="hl-tags">
+          <span class="hl-tag">Aeroacoustics</span>
+          <span class="hl-tag">Lunar Rover</span>
+          <span class="hl-tag">Project Lead</span>
+          <span class="hl-tag">6 Projects</span>
+        </div>
+      </div>
+
+      <!-- Card 3: Personal Projects -->
+      <div class="highlight-card reveal">
+        <div class="hl-label">Personal Projects</div>
+        <div class="hl-title">Live Space Systems</div>
+        <div class="hl-sub">
+          Built a real-time 3D satellite tracking system using
+          SGP4 propagation and a CubeSat simulation with
+          autonomous FDIR fault recovery logic.
+        </div>
+        <div class="hl-tags">
+          <span class="hl-tag">SGP4 / TLE</span>
+          <span class="hl-tag">FDIR Logic</span>
+          <span class="hl-tag">Python &amp; JS</span>
+          <span class="hl-tag">Live Demo</span>
+        </div>
+      </div>
+
+      <!-- Card 4: Leadership -->
+      <div class="highlight-card reveal">
+        <div class="hl-label">Leadership &amp; Outreach</div>
+        <div class="hl-title">15,000+ Students</div>
+        <div class="hl-sub">
+          TA for FSE 100, SPARKS STEM Ambassador, Community
+          Assistant, and Gold Guide — mentoring and welcoming
+          students at ASU.
+        </div>
+        <div class="hl-tags">
+          <span class="hl-tag">Teaching</span>
+          <span class="hl-tag">STEM Mentor</span>
+          <span class="hl-tag">Gold Guide</span>
+          <span class="hl-tag">Community</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ============================================================
        EDUCATION
   ============================================================ -->
   <section id="education">
@@ -1260,7 +1521,7 @@
           <div class="edu-degree">B.E. Aerospace Engineering (Astronautics)</div>
           <div class="edu-school">Arizona State University · Tempe, AZ</div>
           <div class="edu-chips">
-            <span class="edu-chip">High & Low Speed Aerodynamics</span>
+            <span class="edu-chip">High &amp; Low Speed Aerodynamics</span>
             <span class="edu-chip">Orbital Mechanics</span>
             <span class="edu-chip">Thermodynamics</span>
             <span class="edu-chip">Rocket Propulsion</span>
@@ -1327,7 +1588,7 @@
           </li>
         </ul>
 
-        <!-- Your photo — replace me.jpg with your actual filename -->
+        <!-- Replace me.jpg with your actual photo filename -->
         <div class="exp-photo-wrapper">
           <img src="me.jpg" alt="Harjot Kaur at Collins Aerospace" class="exp-photo" />
           <p class="exp-photo-caption">
@@ -1343,9 +1604,7 @@
 
 
   <!-- ============================================================
-       RESEARCH
-       Click any card to expand the full description.
-       Click again to collapse.
+       RESEARCH — click any card to expand description
   ============================================================ -->
   <section id="research">
     <div class="section-inner">
@@ -1362,19 +1621,19 @@
           <div class="research-icon">🛰️</div>
           <span class="research-tag">NASA · RASC-AL</span>
           <div class="research-title">Lunar Sampling Rover</div>
-          <div class="research-role">Structure & Communication Lead</div>
+          <div class="research-role">Structure &amp; Communication Lead</div>
           <div class="research-org">Fall 2025 – Present</div>
           <div class="research-hint">Click to read more</div>
           <div class="research-desc">
             Led the rover structural design, subsystem integration, and communication
             architecture to enable reliable telemetry and mission operations for a lunar
-            surface sampling rover developed for a </strong>NASA RASC-AL</strong> mission concept.
-            Developed the <strong>Lunar Isolation Sample Container (LISC)</strong>, a
-            concept for lunar sample preservation featuring a dual-wall aluminum structure,
-            vacuum insulation, and thermal interfaces designed to maintain volatile stability
-            and structural integrity of collected samples. Additionally led system-level
-            design, CAD modeling, and trade studies for sampling mechanisms, container
-            architecture, and autonomous rover–ascent vehicle sample transfer operations.
+            surface sampling rover developed for a <strong>NASA RASC-AL</strong> mission concept.
+            Developed the <strong>Lunar Isolation Sample Container (LISC)</strong>, featuring
+            a dual-wall aluminum structure, vacuum insulation, and thermal interfaces
+            designed to maintain volatile stability and structural integrity of collected
+            samples. Additionally led system-level design, CAD modeling, and trade studies
+            for sampling mechanisms, container architecture, and autonomous rover–ascent
+            vehicle sample transfer operations.
           </div>
         </div>
 
@@ -1382,8 +1641,8 @@
         <div class="research-card reveal" onclick="toggleCard(this)">
           <div class="research-icon">🔊</div>
           <span class="research-tag">Honeywell Aerospace</span>
-          <div class="research-title">APU Noise Reduction & Acoustic Liner Design</div>
-          <div class="research-role">Project Lead & Project Manager</div>
+          <div class="research-title">APU Noise Reduction &amp; Acoustic Liner Design</div>
+          <div class="research-role">Project Lead &amp; Project Manager</div>
           <div class="research-org">Spring 2025 – Fall 2025</div>
           <div class="research-hint">Click to read more</div>
           <div class="research-desc">
@@ -1391,7 +1650,7 @@
             Power Unit (APU) noise mitigation, exploring both active and passive acoustic
             technologies for liner optimization. Performed preliminary frequency-domain
             analysis and source identification to characterize key APU noise contributors,
-            and collaborated with </strong>Honeywell engineers</strong> to investigate suitable material
+            and collaborated with Honeywell engineers to investigate suitable material
             selections and liner geometry configurations aimed at improving acoustic
             absorption and overall APU noise reduction performance.
           </div>
@@ -1408,11 +1667,11 @@
           <div class="research-desc">
             Defined the telecommunications and ground data subsystems while ensuring
             compliance with NASA standards and maintaining traceability to SMART
-            requirements. Prepared and delivered <strong>System Requirements Review
-            (SRR)</strong> and <strong>Preliminary Design Review (PDR)</strong>
-            documentation aligned with mission objectives, and applied established
-            systems engineering principles to integrate payload data routing and develop
-            a robust, reliable communication architecture.
+            requirements. Prepared and delivered <strong>System Requirements Review (SRR)</strong>
+            and <strong>Preliminary Design Review (PDR)</strong> documentation aligned with
+            mission objectives, and applied established systems engineering principles to
+            integrate payload data routing and develop a robust, reliable communication
+            architecture.
           </div>
         </div>
 
@@ -1427,13 +1686,11 @@
           <div class="research-desc">
             Designed a shielding system for a planetary observation payload by integrating
             environmental sensors with an Arduino-based control system to protect
-            instrumentation from dust and radiation exposure. Utilized <strong>GD&T
+            instrumentation from dust and radiation exposure. Utilized <strong>GD&amp;T
             principles</strong> and <strong>Siemens NX</strong> for mechanical design of
-            the housing and integration components, ensuring manufacturability and precise
-            subsystem interfaces. Coordinated subsystem testing and electrical assembly,
-            including soldering and hardware integration, to verify operational integrity
-            and successfully delivered both Preliminary Design Review (PDR) and Critical
-            Design Review (CDR) documentation.
+            the housing and integration components. Coordinated subsystem testing and
+            electrical assembly to verify operational integrity, and successfully delivered
+            both PDR and CDR documentation.
           </div>
         </div>
 
@@ -1442,7 +1699,7 @@
           <div class="research-icon">🚀</div>
           <span class="research-tag">ASU · Space Works I</span>
           <div class="research-title">Planetary Lander — Structural Design</div>
-          <div class="research-role">ATLO Lead & Safety Engineer</div>
+          <div class="research-role">ATLO Lead &amp; Safety Engineer</div>
           <div class="research-org">Fall 2024</div>
           <div class="research-hint">Click to read more</div>
           <div class="research-desc">
@@ -1450,11 +1707,10 @@
             while ensuring tolerance to impact forces under varying landing conditions.
             Served as Safety Engineer and Assembly, Test, and Launch Operations Lead,
             overseeing procedures to maintain system safety, reliability, and mission
-            readiness. Conducted analytical assessments to determine the appropriate mass,
-            volume, and dimensional parameters required for a stable and successful landing
-            profile, and performed pre-launch tests and simulations to validate the
-            lander's functional performance and structural integrity prior to mission
-            deployment.
+            readiness. Conducted analytical assessments to determine appropriate mass,
+            volume, and dimensional parameters for a stable landing profile, and performed
+            pre-launch tests and simulations to validate functional performance and
+            structural integrity.
           </div>
         </div>
 
@@ -1494,18 +1750,18 @@
       <div class="skills-layout">
 
         <div class="skill-group reveal">
-          <div class="skill-group-title">Modeling & Design</div>
+          <div class="skill-group-title">Modeling &amp; Design</div>
           <div class="skill-tags">
             <span class="skill-tag">SolidWorks</span>
             <span class="skill-tag">NX Siemens</span>
             <span class="skill-tag">AutoCAD</span>
             <span class="skill-tag">TinkerCAD</span>
-            <span class="skill-tag">GD&T</span>
+            <span class="skill-tag">GD&amp;T</span>
           </div>
         </div>
 
         <div class="skill-group reveal">
-          <div class="skill-group-title">Simulation & Analysis</div>
+          <div class="skill-group-title">Simulation &amp; Analysis</div>
           <div class="skill-tags">
             <span class="skill-tag">MATLAB</span>
             <span class="skill-tag">Python</span>
@@ -1515,7 +1771,7 @@
         </div>
 
         <div class="skill-group reveal">
-          <div class="skill-group-title">Programming & Systems</div>
+          <div class="skill-group-title">Programming &amp; Systems</div>
           <div class="skill-tags">
             <span class="skill-tag">Java</span>
             <span class="skill-tag">Arduino IDE</span>
@@ -1535,7 +1791,7 @@
         </div>
 
         <div class="skill-group reveal">
-          <div class="skill-group-title">Hardware & Prototyping</div>
+          <div class="skill-group-title">Hardware &amp; Prototyping</div>
           <div class="skill-tags">
             <span class="skill-tag">Soldering</span>
             <span class="skill-tag">PCB Fabrication</span>
@@ -1561,7 +1817,7 @@
 
 
   <!-- ============================================================
-       PERSONAL PROJECTS
+       PERSONAL PROJECTS — click to expand description
   ============================================================ -->
   <section id="projects">
     <div class="section-inner">
@@ -1573,27 +1829,37 @@
 
       <div class="projects-grid">
 
-        <div class="project-card reveal">
+        <!-- Project 01: Satellite Tracker -->
+        <div class="project-card reveal" onclick="toggleProject(this)">
           <div class="project-num">01</div>
           <div class="project-title">3D Real-Time Satellite Orbit Tracking System</div>
           <div class="project-period">Fall 2025</div>
+          <div class="project-hint">Click to read more</div>
           <div class="project-desc">
             Built a real-time satellite tracking system fetching live TLE data and
-            implementing SGP4 orbit propagation to compute satellite position and
-            velocity. Generates telemetry-style outputs including latitude, longitude,
-            altitude, and velocity for real-time orbital state estimation.
+            implementing SGP4 orbit propagation to compute satellite position and velocity.
+            Originally built with a FastAPI Python backend; refactored for the web using
+            satellite.js so it runs entirely in the browser. Generates telemetry-style
+            outputs including latitude, longitude, altitude, and velocity for real-time
+            orbital state estimation. The live demo is embedded at the top of this page —
+            use the "View in New Screen" link to open the full interactive experience.
           </div>
         </div>
 
-        <div class="project-card reveal">
+        <!-- Project 02: CubeSat FDIR -->
+        <div class="project-card reveal" onclick="toggleProject(this)">
           <div class="project-num">02</div>
           <div class="project-title">CubeSat Simulation with FDIR Logic</div>
           <div class="project-period">Spring 2026</div>
+          <div class="project-hint">Click to read more</div>
           <div class="project-desc">
             Developed a CubeSat simulation system integrating orbital tracking with
-            simulated spacecraft telemetry. Implemented FDIR logic to autonomously
-            identify anomalies, isolate faults, and simulate recovery actions —
-            reducing reliance on manual ground intervention.
+            simulated spacecraft telemetry and operational states. Implemented
+            Fault Detection, Isolation, and Recovery (FDIR) logic to autonomously
+            identify anomalies, isolate subsystem faults, and simulate recovery actions —
+            reducing reliance on manual ground intervention. Built in Python with a
+            backend architecture for simulating spacecraft health monitoring, anomaly
+            propagation, and automated recovery workflows.
           </div>
         </div>
 
@@ -1609,7 +1875,7 @@
     <div class="section-inner">
 
       <div class="section-header reveal">
-        <span class="section-tag">06 — Leadership & Outreach</span>
+        <span class="section-tag">06 — Leadership &amp; Outreach</span>
         <div class="section-line"></div>
       </div>
 
@@ -1650,8 +1916,8 @@
             <div class="lead-org">Hassayampa Academic Village · ASU</div>
             <div class="lead-desc">
               Created inclusive residential communities supporting 200+ students.
-              Organized campus events promoting engagement, mentorship, and
-              collaboration. Led orientation and housing tours for 15,000+ incoming students.
+              Organized campus events promoting engagement, mentorship, and collaboration.
+              Led orientation and housing tours for 15,000+ incoming students.
             </div>
           </div>
           <div class="lead-period">Spring 2022 – Spring 2024</div>
@@ -1722,7 +1988,7 @@
   <script>
 
     /* ── Custom cursor ──
-       Using left/top instead of transform to avoid conflicts
+       Uses left/top positioning (not transform) so it never freezes
     ── */
     const cursor = document.getElementById('cursor');
     const ring   = document.getElementById('cursorRing');
@@ -1744,7 +2010,7 @@
     }
     animCursor();
 
-    /* ring grows slightly when hovering links */
+    /* ring grows when hovering links */
     document.querySelectorAll('a, button').forEach(el => {
       el.addEventListener('mouseenter', () => { ring.style.opacity = '0.9'; });
       el.addEventListener('mouseleave', () => { ring.style.opacity = '0.5'; });
@@ -1752,12 +2018,29 @@
 
 
     /* ── Research card toggle ──
-       Clicking adds/removes the "open" class.
+       Clicking a card adds/removes the "open" class.
        CSS handles the smooth expand/collapse animation.
     ── */
     function toggleCard(card) {
       const isOpen = card.classList.contains('open');
       const hint   = card.querySelector('.research-hint');
+
+      if (isOpen) {
+        card.classList.remove('open');
+        hint.textContent = 'Click to read more';
+      } else {
+        card.classList.add('open');
+        hint.textContent = 'Click to collapse';
+      }
+    }
+
+
+    /* ── Project card toggle ──
+       Same pattern as research cards but for project-hint
+    ── */
+    function toggleProject(card) {
+      const isOpen = card.classList.contains('open');
+      const hint   = card.querySelector('.project-hint');
 
       if (isOpen) {
         card.classList.remove('open');
@@ -1807,18 +2090,32 @@
     drawStars();
 
 
-    /* ── Scroll reveal ── */
-    const reveals  = document.querySelectorAll('.reveal');
+    /* ── Scroll reveal ──
+       Show elements already in viewport on page load,
+       then watch the rest as the user scrolls.
+    ── */
+    const reveals = document.querySelectorAll('.reveal');
+
+    reveals.forEach(r => {
+      if (r.getBoundingClientRect().top < window.innerHeight) {
+        r.classList.add('visible');
+      }
+    });
+
     const observer = new IntersectionObserver(entries => {
       entries.forEach((entry, i) => {
         if (entry.isIntersecting) {
-          setTimeout(() => entry.target.classList.add('visible'), i * 80);
+          setTimeout(() => entry.target.classList.add('visible'), i * 60);
           observer.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.1 });
+    }, { threshold: 0.05 });
 
-    reveals.forEach(r => observer.observe(r));
+    reveals.forEach(r => {
+      if (!r.classList.contains('visible')) {
+        observer.observe(r);
+      }
+    });
 
   </script>
 
