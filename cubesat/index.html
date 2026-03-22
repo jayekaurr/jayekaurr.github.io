@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AETHER-1 — Mission Control</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ── Reset & Base ─────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #F2F4F7;
+      --surface:   #FFFFFF;
+      --surface2:  #F7F8FA;
+      --border:    #DDE1E9;
+      --border-m:  #BCC3CF;
+      --text-1:    #0F1724;
+      --text-2:    #4A5568;
+      --text-3:    #8896A8;
+      --text-4:    #B0BAC8;
+
+      --nominal:   #0A7A55;
+      --nominal-bg:#E6F5EF;
+      --safe:      #B45309;
+      --safe-bg:   #FEF3C7;
+      --emergency: #B91C1C;
+      --emergency-bg:#FEE2E2;
+
+      --green:     #10B981;
+      --green-bg:  #ECFDF5;
+      --amber:     #F59E0B;
+      --amber-bg:  #FFFBEB;
+      --red:       #EF4444;
+      --red-bg:    #FEF2F2;
+      --blue:      #3B82F6;
+      --blue-bg:   #EFF6FF;
+      --purple:    #8B5CF6;
+      --purple-bg: #F5F3FF;
+
+      --mono: 'IBM Plex Mono', monospace;
+      --sans: 'IBM Plex Sans', sans-serif;
+
+      --rad-sm: 4px;
+      --rad:    8px;
+      --rad-lg: 12px;
+      --rad-xl: 16px;
+
+      --shadow-sm: 0 1px 3px rgba(15,23,36,0.07), 0 1px 2px rgba(15,23,36,0.05);
+      --shadow:    0 4px 12px rgba(15,23,36,0.08), 0 2px 4px rgba(15,23,36,0.04);
+    }
+
+    html, body {
+      height: 100%;
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text-1);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    /* ── Layout ───────────────────────────────── */
+    .shell {
+      display: grid;
+      grid-template-rows: 52px 1fr;
+      grid-template-columns: 220px 1fr 280px;
+      grid-template-areas:
+        "header header header"
+        "sidebar main   right";
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── Header ───────────────────────────────── */
+    .header {
+      grid-area: header;
+      background: var(--text-1);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      gap: 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #fff;
+    }
+
+    .sat-icon {
+      width: 28px;
+      height: 28px;
+      position: relative;
+    }
+
+    .header-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: 0.05em;
+    }
+
+    .header-sub {
+      font-size: 11px;
+      color: rgba(255,255,255,0.45);
+      font-family: var(--mono);
+      letter-spacing: 0.04em;
+    }
+
+    .header-divider {
+      width: 1px;
+      height: 24px;
+      background: rgba(255,255,255,0.12);
+    }
+
+    .mode-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 600;
+      font-family: var(--mono);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: all 0.3s;
+    }
+
+    .mode-badge.nominal  { background: var(--nominal-bg);   color: var(--nominal);   }
+    .mode-badge.safe     { background: var(--safe-bg);      color: var(--safe);      }
+    .mode-badge.emergency{ background: var(--emergency-bg); color: var(--emergency); }
+
+    .mode-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      animation: pulse-dot 2s infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .header-clock {
+      margin-left: auto;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 0.06em;
+    }
+
+    .header-step {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: rgba(255,255,255,0.35);
+    }
+
+    /* ── Sidebar ──────────────────────────────── */
+    .sidebar {
+      grid-area: sidebar;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      padding: 16px 0;
+    }
+
+    .sidebar-section {
+      padding: 0 14px;
+      margin-bottom: 20px;
+    }
+
+    .sidebar-label {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-4);
+      margin-bottom: 8px;
+      padding: 0 2px;
+    }
+
+    /* ── Vitals Card ──────────────────────────── */
+    .vital-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--rad);
+      padding: 10px 12px;
+      margin-bottom: 6px;
+      cursor: default;
+      transition: border-color 0.2s;
+    }
+
+    .vital-card:hover { border-color: var(--border-m); }
+
+    .vital-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .vital-name {
+      font-size: 11px;
+      color: var(--text-3);
+      font-weight: 500;
+    }
+
+    .vital-value {
+      font-family: var(--mono);
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text-1);
+      transition: color 0.3s;
+    }
+
+    .vital-unit {
+      font-size: 10px;
+      color: var(--text-3);
+      margin-left: 2px;
+    }
+
+    .vital-bar-track {
+      height: 3px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    .vital-bar-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.5s ease, background 0.3s;
+    }
+
+    /* Status Dots ─────────────────────────────── */
+    .status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 5px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .status-row:last-child { border-bottom: none; }
+
+    .status-label {
+      font-size: 11px;
+      color: var(--text-2);
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .dot.green   { background: var(--green); }
+    .dot.amber   { background: var(--amber); }
+    .dot.red     { background: var(--red); box-shadow: 0 0 0 2px rgba(239,68,68,0.2); }
+    .dot.grey    { background: var(--text-4); }
+    .dot.pulse   { animation: pulse-dot 1.5s infinite; }
+
+    /* ── Main Area ────────────────────────────── */
+    .main {
+      grid-area: main;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* ── Metric Row ───────────────────────────── */
+    .metric-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .metric-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--rad-lg);
+      padding: 14px 16px;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .metric-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--accent, var(--border));
+      border-radius: var(--rad-lg) var(--rad-lg) 0 0;
+    }
+
+    .metric-card.power    { --accent: var(--amber); }
+    .metric-card.thermal  { --accent: var(--red); }
+    .metric-card.comms    { --accent: var(--blue); }
+    .metric-card.adcs     { --accent: var(--purple); }
+
+    .metric-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      margin-bottom: 6px;
+    }
+
+    .metric-value {
+      font-family: var(--mono);
+      font-size: 26px;
+      font-weight: 500;
+      color: var(--text-1);
+      line-height: 1;
+      margin-bottom: 4px;
+      transition: color 0.3s;
+    }
+
+    .metric-sub {
+      font-size: 11px;
+      color: var(--text-3);
+    }
+
+    /* ── Charts Row ───────────────────────────── */
+    .charts-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .chart-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--rad-lg);
+      padding: 14px 16px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .chart-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .chart-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-2);
+      letter-spacing: 0.02em;
+    }
+
+    .chart-badge {
+      font-size: 10px;
+      font-family: var(--mono);
+      padding: 2px 8px;
+      border-radius: 100px;
+      border: 1px solid var(--border);
+      color: var(--text-3);
+    }
+
+    .chart-canvas-wrap {
+      position: relative;
+      height: 110px;
+    }
+
+    /* ── Orbit Card ───────────────────────────── */
+    .orbit-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--rad-lg);
+      padding: 14px 16px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .orbit-visual {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .orbit-svg-wrap {
+      flex-shrink: 0;
+    }
+
+    .orbit-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .orbit-stat {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--rad);
+      padding: 8px 10px;
+    }
+
+    .orbit-stat-label {
+      font-size: 10px;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+
+    .orbit-stat-value {
+      font-family: var(--mono);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-1);
+    }
+
+    /* ── Right Panel ──────────────────────────── */
+    .right-panel {
+      grid-area: right;
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .panel-section {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .panel-title {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      margin-bottom: 10px;
+    }
+
+    /* ── Active Faults ────────────────────────── */
+    .fault-list { display: flex; flex-direction: column; gap: 6px; }
+
+    .fault-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: var(--rad);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      animation: fault-in 0.3s ease;
+    }
+
+    @keyframes fault-in {
+      from { opacity: 0; transform: translateX(8px); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    .fault-item.critical {
+      background: var(--emergency-bg);
+      border-color: #FECACA;
+    }
+
+    .fault-item.warning {
+      background: var(--safe-bg);
+      border-color: #FDE68A;
+    }
+
+    .fault-item.caution {
+      background: var(--blue-bg);
+      border-color: #BFDBFE;
+    }
+
+    .fault-severity {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-top: 1px;
+    }
+
+    .fault-severity.critical { color: var(--red); }
+    .fault-severity.warning  { color: var(--amber); }
+    .fault-severity.caution  { color: var(--blue); }
+
+    .fault-type {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-1);
+      font-family: var(--mono);
+    }
+
+    .fault-desc {
+      font-size: 11px;
+      color: var(--text-2);
+      margin-top: 1px;
+    }
+
+    .fault-sub {
+      font-size: 10px;
+      color: var(--text-3);
+      font-family: var(--mono);
+    }
+
+    .no-faults {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px;
+      background: var(--green-bg);
+      border: 1px solid #A7F3D0;
+      border-radius: var(--rad);
+      font-size: 12px;
+      color: var(--nominal);
+      font-weight: 500;
+    }
+
+    /* ── Event Log ────────────────────────────── */
+    .event-log { display: flex; flex-direction: column; gap: 2px; }
+
+    .event-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 5px 0;
+      border-bottom: 1px solid var(--border);
+      animation: log-in 0.25s ease;
+    }
+
+    @keyframes log-in {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    .event-step {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-4);
+      min-width: 32px;
+      padding-top: 1px;
+    }
+
+    .event-kind {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 3px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .event-kind.FAULT     { background: var(--emergency-bg); color: var(--red); }
+    .event-kind.RESOLVED  { background: var(--green-bg);     color: var(--nominal); }
+    .event-kind.RECOVERY  { background: var(--green-bg);     color: var(--nominal); }
+    .event-kind.NOMINAL   { background: var(--green-bg);     color: var(--nominal); }
+    .event-kind.ORBIT     { background: var(--blue-bg);      color: var(--blue); }
+    .event-kind.COMMAND   { background: var(--purple-bg);    color: var(--purple); }
+
+    .event-detail {
+      font-size: 11px;
+      color: var(--text-2);
+      line-height: 1.4;
+    }
+
+    /* ── Controls ─────────────────────────────── */
+    .controls { display: flex; flex-direction: column; gap: 6px; }
+
+    .ctrl-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--rad);
+      font-family: var(--sans);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-2);
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: left;
+    }
+
+    .ctrl-btn:hover {
+      background: var(--surface);
+      border-color: var(--border-m);
+      color: var(--text-1);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .ctrl-btn:active { transform: scale(0.98); }
+
+    .ctrl-btn.primary {
+      background: var(--text-1);
+      border-color: var(--text-1);
+      color: #fff;
+    }
+
+    .ctrl-btn.primary:hover {
+      background: #1E2A3A;
+      border-color: #1E2A3A;
+    }
+
+    .ctrl-btn.danger {
+      color: var(--red);
+      border-color: #FECACA;
+      background: var(--emergency-bg);
+    }
+
+    /* ── Speed Control ────────────────────────── */
+    .speed-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .speed-label { font-size: 11px; color: var(--text-3); min-width: 50px; }
+
+    .speed-btns { display: flex; gap: 4px; }
+
+    .speed-btn {
+      padding: 3px 10px;
+      font-size: 11px;
+      font-family: var(--mono);
+      border: 1px solid var(--border);
+      border-radius: var(--rad-sm);
+      background: transparent;
+      color: var(--text-3);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .speed-btn:hover { border-color: var(--border-m); color: var(--text-1); }
+    .speed-btn.active { background: var(--text-1); border-color: var(--text-1); color: #fff; }
+
+    /* ── Paused Overlay ───────────────────────── */
+    .paused-banner {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: var(--safe-bg);
+      border-bottom: 1px solid #FDE68A;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--safe);
+      grid-column: 1 / -1;
+    }
+
+    .paused-banner.visible { display: flex; }
+
+    /* ── Scrollbar ────────────────────────────── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--border-m); }
+
+    /* ── Connection error ─────────────────────── */
+    .conn-error {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      background: var(--emergency-bg);
+      border: 1px solid #FECACA;
+      border-radius: 100px;
+      font-size: 11px;
+      color: var(--red);
+      font-weight: 500;
+    }
+
+    .conn-error.visible { display: flex; }
+
+    /* Responsive adjustments */
+    @media (max-width: 1100px) {
+      .shell {
+        grid-template-columns: 190px 1fr 240px;
+      }
+      .metric-row {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- ── Header ─────────────────────────────── -->
+  <header class="header">
+    <div class="header-logo">
+      <svg class="sat-icon" viewBox="0 0 28 28" fill="none">
+        <rect x="11" y="8" width="6" height="12" rx="1.5" fill="rgba(255,255,255,0.9)"/>
+        <rect x="2"  y="12" width="8" height="4"  rx="1"   fill="rgba(255,255,255,0.6)"/>
+        <rect x="18" y="12" width="8" height="4"  rx="1"   fill="rgba(255,255,255,0.6)"/>
+        <circle cx="14" cy="14" r="2" fill="rgba(255,255,255,0.4)"/>
+        <line x1="14" y1="3"  x2="14" y2="7"  stroke="rgba(255,255,255,0.5)" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="14" y1="21" x2="14" y2="25" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <div>
+        <div class="header-title">AETHER-1</div>
+        <div class="header-sub">MX-2024-001 · LEO 550 km</div>
+      </div>
+    </div>
+
+    <div class="header-divider"></div>
+
+    <div class="mode-badge nominal" id="mode-badge">
+      <div class="mode-dot"></div>
+      <span id="mode-text">NOMINAL</span>
+    </div>
+
+    <div class="conn-error" id="conn-error">
+      <div class="dot red pulse"></div>
+      NO TELEMETRY
+    </div>
+
+    <div class="header-clock" id="clock">--:--:-- UTC</div>
+    <div class="header-step" id="step-label">STEP —</div>
+  </header>
+
+  <!-- ── Sidebar ─────────────────────────────── -->
+  <aside class="sidebar">
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Power · EPS</div>
+      <div class="vital-card">
+        <div class="vital-row">
+          <span class="vital-name">Battery</span>
+          <span><span class="vital-value" id="sb-battery">—</span><span class="vital-unit">%</span></span>
+        </div>
+        <div class="vital-bar-track">
+          <div class="vital-bar-fill" id="sb-battery-bar" style="width:0%;background:var(--green)"></div>
+        </div>
+      </div>
+      <div class="vital-card">
+        <div class="vital-row">
+          <span class="vital-name">Power Draw</span>
+          <span><span class="vital-value" id="sb-power">—</span><span class="vital-unit">W</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Thermal</div>
+      <div class="vital-card">
+        <div class="vital-row">
+          <span class="vital-name">Temperature</span>
+          <span><span class="vital-value" id="sb-temp">—</span><span class="vital-unit">°C</span></span>
+        </div>
+        <div class="vital-bar-track">
+          <div class="vital-bar-fill" id="sb-temp-bar" style="width:0%;background:var(--blue)"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Subsystem Status</div>
+      <div class="vital-card" style="padding: 8px 12px;">
+        <div class="status-row">
+          <span class="status-label">EPS</span>
+          <div class="status-indicator" id="st-eps">
+            <div class="dot green"></div><span>Nominal</span>
+          </div>
+        </div>
+        <div class="status-row">
+          <span class="status-label">Thermal</span>
+          <div class="status-indicator" id="st-thermal">
+            <div class="dot green"></div><span>Nominal</span>
+          </div>
+        </div>
+        <div class="status-row">
+          <span class="status-label">ADCS</span>
+          <div class="status-indicator" id="st-adcs">
+            <div class="dot green"></div><span>Nominal</span>
+          </div>
+        </div>
+        <div class="status-row">
+          <span class="status-label">Comms</span>
+          <div class="status-indicator" id="st-comms">
+            <div class="dot green"></div><span>Nominal</span>
+          </div>
+        </div>
+        <div class="status-row">
+          <span class="status-label">Payload</span>
+          <div class="status-indicator" id="st-payload">
+            <div class="dot green"></div><span>Active</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Orbit</div>
+      <div class="vital-card" style="padding: 8px 12px;">
+        <div class="status-row">
+          <span class="status-label">Orbit #</span>
+          <span class="status-indicator" style="font-family:var(--mono);font-size:12px" id="sb-orbit">—</span>
+        </div>
+        <div class="status-row">
+          <span class="status-label">Sunlight</span>
+          <div class="status-indicator" id="st-sun">
+            <div class="dot green"></div><span>Illuminated</span>
+          </div>
+        </div>
+        <div class="status-row">
+          <span class="status-label">Ground Cxn</span>
+          <div class="status-indicator" id="st-ground">
+            <div class="dot green"></div><span>Acquired</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ── Main ────────────────────────────────── -->
+  <main class="main">
+
+    <!-- Metric Row -->
+    <div class="metric-row">
+      <div class="metric-card power">
+        <div class="metric-label">Battery SOC</div>
+        <div class="metric-value" id="m-battery">—<span style="font-size:16px">%</span></div>
+        <div class="metric-sub" id="m-solar-status">Solar charging active</div>
+      </div>
+      <div class="metric-card thermal">
+        <div class="metric-label">Temperature</div>
+        <div class="metric-value" id="m-temp">—<span style="font-size:16px">°C</span></div>
+        <div class="metric-sub" id="m-heater-status">Heater off</div>
+      </div>
+      <div class="metric-card comms">
+        <div class="metric-label">Link Quality</div>
+        <div class="metric-value" id="m-link">—<span style="font-size:16px">%</span></div>
+        <div class="metric-sub" id="m-packets">↑0 ↓0 packets</div>
+      </div>
+      <div class="metric-card adcs">
+        <div class="metric-label">Pointing Error</div>
+        <div class="metric-value" id="m-point">—<span style="font-size:14px">°</span></div>
+        <div class="metric-sub" id="m-adcs-status">Attitude stable</div>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-header">
+          <span class="chart-title">Battery State of Charge</span>
+          <span class="chart-badge" id="chart-bat-latest">—%</span>
+        </div>
+        <div class="chart-canvas-wrap">
+          <canvas id="chart-battery"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-header">
+          <span class="chart-title">Spacecraft Temperature</span>
+          <span class="chart-badge" id="chart-temp-latest">— °C</span>
+        </div>
+        <div class="chart-canvas-wrap">
+          <canvas id="chart-temp"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Orbit + Link -->
+    <div class="charts-row">
+      <div class="orbit-card">
+        <div class="chart-header">
+          <span class="chart-title">Orbital Position</span>
+          <span class="chart-badge" id="orbit-alt">550 km LEO</span>
+        </div>
+        <div class="orbit-visual">
+          <div class="orbit-svg-wrap">
+            <svg width="120" height="120" viewBox="0 0 120 120">
+              <!-- Earth -->
+              <circle cx="60" cy="60" r="22" fill="#1D4ED8" opacity="0.15"/>
+              <circle cx="60" cy="60" r="22" fill="none" stroke="#1D4ED8" stroke-width="1" opacity="0.4"/>
+              <text x="60" y="64" text-anchor="middle" font-size="9" fill="#1D4ED8" opacity="0.8" font-family="IBM Plex Sans,sans-serif">Earth</text>
+              <!-- Orbit path -->
+              <circle cx="60" cy="60" r="44" fill="none" stroke="#BCC3CF" stroke-width="1" stroke-dasharray="3 3"/>
+              <!-- Shadow arc (eclipse zone) -->
+              <path id="shadow-arc" d="" fill="rgba(30,42,58,0.1)"/>
+              <!-- Satellite -->
+              <g id="sat-pos">
+                <circle r="5" fill="#0F1724"/>
+                <rect x="-8" y="-2" width="4" height="4" rx="0.5" fill="#0F1724" opacity="0.6"/>
+                <rect x="4"  y="-2" width="4" height="4" rx="0.5" fill="#0F1724" opacity="0.6"/>
+              </g>
+            </svg>
+          </div>
+          <div class="orbit-stats">
+            <div class="orbit-stat">
+              <div class="orbit-stat-label">Altitude</div>
+              <div class="orbit-stat-value">550 km</div>
+            </div>
+            <div class="orbit-stat">
+              <div class="orbit-stat-label">Period</div>
+              <div class="orbit-stat-value">48 min</div>
+            </div>
+            <div class="orbit-stat">
+              <div class="orbit-stat-label">Orbit #</div>
+              <div class="orbit-stat-value" id="orb-num">—</div>
+            </div>
+            <div class="orbit-stat">
+              <div class="orbit-stat-label">Eclipse</div>
+              <div class="orbit-stat-value" id="orb-eclipse">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-header">
+          <span class="chart-title">Downlink Quality</span>
+          <span class="chart-badge" id="chart-link-latest">—%</span>
+        </div>
+        <div class="chart-canvas-wrap">
+          <canvas id="chart-link"></canvas>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── Right Panel ─────────────────────────── -->
+  <aside class="right-panel">
+
+    <div class="panel-section">
+      <div class="panel-title">Active Faults</div>
+      <div class="fault-list" id="fault-list">
+        <div class="no-faults">
+          <div class="dot green"></div>
+          All systems nominal
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-section" style="flex:1; overflow-y:auto;">
+      <div class="panel-title">Event Log</div>
+      <div class="event-log" id="event-log"></div>
+    </div>
+
+    <div class="panel-section">
+      <div class="panel-title">Ground Commands</div>
+      <div class="controls">
+        <button class="ctrl-btn" onclick="sendCmd('PAYLOAD_ON')">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.2"/><path d="M4 6l1.5 1.5L8 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          Enable Payload
+        </button>
+        <button class="ctrl-btn" onclick="sendCmd('PAYLOAD_OFF')">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.2"/><path d="M4 4l4 4M8 4l-4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          Disable Payload
+        </button>
+        <button class="ctrl-btn" onclick="sendCmd('ENABLE_HEATER')">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M3 4l3-3 3 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          Enable Heater
+        </button>
+        <button class="ctrl-btn" onclick="sendCmd('STABILISE_ATTITUDE')">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.2"/><circle cx="6" cy="6" r="1.5" fill="currentColor"/></svg>
+          Stabilise Attitude
+        </button>
+        <button class="ctrl-btn danger" onclick="sendCmd('ENTER_SAFE_MODE')">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1L1 4v3c0 2.2 2.1 4.2 5 4.8 2.9-.6 5-2.6 5-4.8V4L6 1z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+          Force Safe Mode
+        </button>
+      </div>
+
+      <div class="speed-row">
+        <span class="speed-label">Sim speed</span>
+        <div class="speed-btns">
+          <button class="speed-btn" onclick="setSpeed(3000)">0.3×</button>
+          <button class="speed-btn active" id="spd-1" onclick="setSpeed(1500)">1×</button>
+          <button class="speed-btn" onclick="setSpeed(500)">3×</button>
+          <button class="speed-btn" onclick="setSpeed(0)">⏸</button>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+// ── State ──────────────────────────────────────────────────────────────────
+const API = "http://127.0.0.1:8000";
+let simInterval = null;
+let simSpeed = 1500;
+let isPaused = false;
+let lastStep = 0;
+
+// ── Clock ──────────────────────────────────────────────────────────────────
+function tickClock() {
+  const now = new Date();
+  const h = String(now.getUTCHours()).padStart(2,'0');
+  const m = String(now.getUTCMinutes()).padStart(2,'0');
+  const s = String(now.getUTCSeconds()).padStart(2,'0');
+  document.getElementById('clock').textContent = `${h}:${m}:${s} UTC`;
+}
+setInterval(tickClock, 1000);
+tickClock();
+
+// ── Charts ─────────────────────────────────────────────────────────────────
+function makeChart(id, color, yMin, yMax, label) {
+  const ctx = document.getElementById(id).getContext('2d');
+  return new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [{
+        data: [],
+        borderColor: color,
+        borderWidth: 1.5,
+        pointRadius: 0,
+        fill: true,
+        backgroundColor: color + '18',
+        tension: 0.35,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 200 },
+      plugins: { legend: { display: false }, tooltip: {
+        callbacks: { label: (c) => `${c.parsed.y.toFixed(1)} ${label}` }
+      }},
+      scales: {
+        x: {
+          display: false,
+          ticks: { display: false },
+          grid: { display: false }
+        },
+        y: {
+          min: yMin,
+          max: yMax,
+          ticks: {
+            font: { family: 'IBM Plex Mono', size: 10 },
+            color: '#8896A8',
+            maxTicksLimit: 4,
+          },
+          grid: { color: '#DDE1E9', lineWidth: 0.5 }
+        }
+      }
+    }
+  });
+}
+
+const chartBattery = makeChart('chart-battery', '#F59E0B',   0, 100, '%');
+const chartTemp    = makeChart('chart-temp',    '#EF4444', -20,  80, '°C');
+const chartLink    = makeChart('chart-link',    '#3B82F6',   0, 100, '%');
+
+function pushChart(chart, value, maxPoints = 50) {
+  chart.data.labels.push('');
+  chart.data.datasets[0].data.push(value);
+  if (chart.data.labels.length > maxPoints) {
+    chart.data.labels.shift();
+    chart.data.datasets[0].data.shift();
+  }
+  chart.update();
+}
+
+// ── Orbit Visualisation ────────────────────────────────────────────────────
+function updateOrbitVis(orbitStep, orbitPeriod, inSunlight) {
+  const angle = (orbitStep / orbitPeriod) * 2 * Math.PI - Math.PI / 2;
+  const R = 44, cx = 60, cy = 60;
+  const sx = cx + R * Math.cos(angle);
+  const sy = cy + R * Math.sin(angle);
+
+  const satG = document.getElementById('sat-pos');
+  satG.setAttribute('transform', `translate(${sx.toFixed(1)}, ${sy.toFixed(1)})`);
+}
+
+// ── Status Helpers ─────────────────────────────────────────────────────────
+function setStatus(id, good, label, dotClass) {
+  const el = document.getElementById(id);
+  el.innerHTML = `<div class="dot ${dotClass || (good ? 'green' : 'red')}"></div><span>${label}</span>`;
+}
+
+function setBatBar(pct) {
+  const bar = document.getElementById('sb-battery-bar');
+  bar.style.width = pct + '%';
+  bar.style.background = pct < 15 ? '#EF4444' : pct < 30 ? '#F59E0B' : '#10B981';
+}
+
+function setTempBar(temp) {
+  const bar = document.getElementById('sb-temp-bar');
+  const pct = Math.max(0, Math.min(100, ((temp + 20) / 100) * 100));
+  bar.style.width = pct + '%';
+  bar.style.background = temp > 45 ? '#EF4444' : temp < -10 ? '#3B82F6' : '#F59E0B';
+}
+
+function setModeBadge(mode) {
+  const badge = document.getElementById('mode-badge');
+  const text  = document.getElementById('mode-text');
+  badge.className = 'mode-badge ' + mode.toLowerCase();
+  text.textContent = mode;
+}
+
+// ── Fault Rendering ────────────────────────────────────────────────────────
+function renderFaults(activeFaults) {
+  const list = document.getElementById('fault-list');
+
+  if (!activeFaults || activeFaults.length === 0) {
+    list.innerHTML = `<div class="no-faults"><div class="dot green"></div>All systems nominal</div>`;
+    return;
+  }
+
+  const severityMap = {
+    CRITICAL_BATTERY: { sev: 'critical', sub: 'EPS' },
+    LOW_BATTERY:      { sev: 'warning',  sub: 'EPS' },
+    HIGH_TEMP:        { sev: 'warning',  sub: 'THERMAL' },
+    LOW_TEMP:         { sev: 'warning',  sub: 'THERMAL' },
+    ATTITUDE_FAULT:   { sev: 'warning',  sub: 'ADCS' },
+    COMMS_DEGRADED:   { sev: 'caution',  sub: 'COMMS' },
+  };
+
+  const descMap = {
+    CRITICAL_BATTERY: 'Imminent power loss – emergency action',
+    LOW_BATTERY:      'Battery below minimum threshold',
+    HIGH_TEMP:        'Temperature exceeding safe operating range',
+    LOW_TEMP:         'Temperature below cold survival limit',
+    ATTITUDE_FAULT:   'Pointing error exceeds threshold',
+    COMMS_DEGRADED:   'Downlink quality degraded',
+  };
+
+  list.innerHTML = activeFaults.map(ft => {
+    const info = severityMap[ft] || { sev: 'warning', sub: 'UNK' };
+    return `
+      <div class="fault-item ${info.sev}">
+        <div>
+          <div class="fault-severity ${info.sev}">${info.sev}</div>
+          <div class="fault-type">${ft}</div>
+          <div class="fault-desc">${descMap[ft] || ''}</div>
+        </div>
+        <div class="fault-sub" style="margin-left:auto;padding-top:2px">${info.sub}</div>
+      </div>`;
+  }).join('');
+}
+
+// ── Event Log Rendering ────────────────────────────────────────────────────
+function renderEvents(events) {
+  const log = document.getElementById('event-log');
+  log.innerHTML = [...events].reverse().map(e => `
+    <div class="event-item">
+      <span class="event-step">${e.step}</span>
+      <span class="event-kind ${e.kind}">${e.kind}</span>
+      <span class="event-detail">${e.detail}</span>
+    </div>`).join('');
+}
+
+// ── Main Update ────────────────────────────────────────────────────────────
+async function stepSim() {
+  try {
+    const res = await fetch(`${API}/step`);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const t = data.telemetry;
+
+    document.getElementById('conn-error').classList.remove('visible');
+
+    // Header
+    document.getElementById('step-label').textContent = `STEP ${data.step}`;
+    setModeBadge(data.mode);
+
+    // Sidebar vitals
+    document.getElementById('sb-battery').textContent = t.battery.toFixed(1);
+    document.getElementById('sb-power').textContent   = t.power_draw_w.toFixed(2);
+    document.getElementById('sb-temp').textContent    = t.temperature.toFixed(1);
+    document.getElementById('sb-orbit').textContent   = `#${t.orbit_number}`;
+    setBatBar(t.battery);
+    setTempBar(t.temperature);
+
+    // Metric cards
+    document.getElementById('m-battery').innerHTML = `${t.battery.toFixed(1)}<span style="font-size:16px">%</span>`;
+    document.getElementById('m-temp').innerHTML    = `${t.temperature.toFixed(1)}<span style="font-size:16px">°C</span>`;
+    document.getElementById('m-link').innerHTML    = `${t.link_quality.toFixed(0)}<span style="font-size:16px">%</span>`;
+    document.getElementById('m-point').innerHTML   = `${t.pointing_error_deg.toFixed(2)}<span style="font-size:14px">°</span>`;
+
+    document.getElementById('m-solar-status').textContent   = t.solar_charging ? 'Solar charging active' : 'Eclipse – battery draining';
+    document.getElementById('m-heater-status').textContent  = t.heater_on ? 'Heater active' : 'Heater off';
+    document.getElementById('m-packets').textContent        = `↑${t.uplink_packets}  ↓${t.downlink_packets} packets`;
+    document.getElementById('m-adcs-status').textContent    = t.attitude_stable ? 'Attitude stable' : 'Attitude unstable';
+
+    // Charts
+    pushChart(chartBattery, t.battery);
+    pushChart(chartTemp,    t.temperature);
+    pushChart(chartLink,    t.link_quality);
+
+    document.getElementById('chart-bat-latest').textContent  = t.battery.toFixed(1) + '%';
+    document.getElementById('chart-temp-latest').textContent = t.temperature.toFixed(1) + ' °C';
+    document.getElementById('chart-link-latest').textContent = t.link_quality.toFixed(0) + '%';
+
+    // Orbit vis
+    updateOrbitVis(data.telemetry.orbit_number % 48, 48, t.in_sunlight);
+    document.getElementById('orb-num').textContent     = t.orbit_number;
+    document.getElementById('orb-eclipse').textContent = t.in_sunlight ? '0 steps' : `${t.eclipse_duration} step${t.eclipse_duration !== 1 ? 's' : ''}`;
+
+    // Status indicators
+    const battOk = t.battery >= 20;
+    const tempOk = t.temperature > -15 && t.temperature < 50;
+    setStatus('st-eps',     battOk, battOk ? 'Nominal' : 'Fault',    battOk ? 'green' : 'red');
+    setStatus('st-thermal', tempOk, tempOk ? 'Nominal' : 'Fault',    tempOk ? 'green' : 'red');
+    setStatus('st-adcs',    t.attitude_stable, t.attitude_stable ? 'Nominal' : 'Unstable',  t.attitude_stable ? 'green' : 'amber');
+    const commsOk = t.link_quality > 50 || !t.in_ground_contact;
+    setStatus('st-comms',   commsOk, t.in_ground_contact ? (commsOk ? 'Acquired' : 'Degraded') : 'Out of range', t.in_ground_contact ? (commsOk ? 'green' : 'amber') : 'grey');
+    setStatus('st-payload', t.payload_on, t.payload_on ? 'Active' : 'Off', t.payload_on ? 'green' : 'grey');
+    setStatus('st-sun',     t.in_sunlight, t.in_sunlight ? 'Illuminated' : 'Eclipse', t.in_sunlight ? 'green' : 'grey');
+    setStatus('st-ground',  t.in_ground_contact, t.in_ground_contact ? 'Acquired' : 'Out of range', t.in_ground_contact ? 'green' : 'grey');
+
+    // Faults & Events
+    renderFaults(data.active_faults);
+    if (data.events) renderEvents(data.events);
+
+  } catch (e) {
+    document.getElementById('conn-error').classList.add('visible');
+    console.error('API error:', e);
+  }
+}
+
+// ── Sim Speed Control ──────────────────────────────────────────────────────
+function setSpeed(ms) {
+  document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+
+  if (simInterval) clearInterval(simInterval);
+
+  if (ms === 0) {
+    isPaused = true;
+  } else {
+    isPaused = false;
+    simSpeed = ms;
+    simInterval = setInterval(stepSim, simSpeed);
+  }
+}
+
+// ── Commands ───────────────────────────────────────────────────────────────
+async function sendCmd(cmd) {
+  try {
+    await fetch(`${API}/command/${cmd}`, { method: 'POST' });
+    await stepSim(); // immediate refresh
+  } catch(e) {
+    console.error('Command failed:', e);
+  }
+}
+
+// ── Start ──────────────────────────────────────────────────────────────────
+simInterval = setInterval(stepSim, simSpeed);
+stepSim(); // immediate first fetch
+</script>
+</body>
+</html>
