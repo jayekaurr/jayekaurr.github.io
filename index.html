@@ -89,8 +89,11 @@
     canvas#stars {
       position: fixed;
       inset: 0;
+      width: 100%;
+      height: 100%;
       z-index: 0;
       opacity: 1;
+      pointer-events: none;
     }
 
 
@@ -159,10 +162,13 @@
     }
 
 
-    /* all sections sit above the canvas */
+    /* all sections sit above the canvas — must be block-level full width */
     section {
       position: relative;
       z-index: 1;
+      display: block;
+      width: 100%;
+      clear: both;
     }
 
 
@@ -585,6 +591,8 @@
     ============================================================ */
     #education {
       background: var(--bg2);
+      display: block;
+      width: 100%;
     }
 
     .edu-card {
@@ -661,6 +669,8 @@
     ============================================================ */
     #experience {
       background: var(--bg);
+      display: block;
+      width: 100%;
     }
 
     .exp-card {
@@ -794,6 +804,8 @@
     ============================================================ */
     #research {
       background: var(--bg2);
+      display: block;
+      width: 100%;
     }
 
     .research-grid {
@@ -953,6 +965,8 @@
     ============================================================ */
     #skills {
       background: var(--bg);
+      display: block;
+      width: 100%;
     }
 
     .skills-layout {
@@ -1021,6 +1035,8 @@
     ============================================================ */
     #projects {
       background: var(--bg2);
+      display: block;
+      width: 100%;
     }
 
     .projects-grid {
@@ -1130,59 +1146,16 @@
       margin-top: 14px;
     }
 
-    /* ── Live tracker CTA inside expanded project card ── */
-    .project-live-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 20px;
-      padding: 10px 18px;
-      background: rgba(139, 69, 19, 0.06);
-      border: 1px solid rgba(139, 69, 19, 0.25);
-      border-radius: 6px;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.68rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--accent);
-      text-decoration: none;
-      transition: all 0.22s ease;
-      cursor: pointer;
-    }
-
-    .project-live-link:hover {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: #ffffff;
-      transform: translateY(-1px);
-      box-shadow: 0 6px 20px rgba(139, 69, 19, 0.22);
-    }
-
-    /* pulsing dot inside the live link */
-    .project-live-link .live-dot {
-      width: 6px;
-      height: 6px;
-      background: currentColor;
-      border-radius: 50%;
-      flex-shrink: 0;
-      animation: pulse 2s infinite;
-    }
-
-    /* divider line above the live link */
-    .project-live-divider {
-      width: 100%;
-      height: 1px;
-      background: rgba(139, 69, 19, 0.12);
-      margin-top: 18px;
-    }
-
-
 
     /* ============================================================
        LEADERSHIP SECTION
     ============================================================ */
     #leadership {
       background: var(--bg);
+      display: block;
+      width: 100%;
+      clear: both;
+      overflow: hidden;
     }
 
     .leadership-list {
@@ -1249,6 +1222,12 @@
     #contact {
       background: var(--bg2);
       text-align: center;
+      position: relative;
+      z-index: 1;
+      display: block;
+      width: 100%;
+      clear: both;
+      float: none;
     }
 
     .contact-inner {
@@ -1371,6 +1350,12 @@
     /* ============================================================
        MOBILE RESPONSIVE
     ============================================================ */
+    /* Force all grid sections to single column below 900px */
+    @media (max-width: 900px) {
+      .projects-grid    { grid-template-columns: 1fr; }
+      .highlights-inner { grid-template-columns: repeat(2, 1fr); }
+    }
+
     @media (max-width: 768px) {
       nav               { padding: 16px 24px; }
       .nav-links        { display: none; }
@@ -1384,6 +1369,8 @@
       .highlights-inner { grid-template-columns: 1fr; padding: 32px 24px; }
       .highlight-card   { border-right: none; border-bottom: 1px solid rgba(139, 69, 19, 0.12); }
       .highlight-card:last-child { border-bottom: none; }
+      .contact-inner    { padding: 60px 24px; }
+      .exp-photo        { width: 100%; height: 200px; }
     }
 
   </style>
@@ -1480,18 +1467,19 @@
   <section id="highlights">
     <div class="highlights-inner">
 
-      <div class="section-header reveal">
-        <span class="section-tag">01 — Highlights</span>
-        <div class="section-line"></div>
-      </div>
-      
       <!-- Card 1: Collins Aerospace -->
       <div class="highlight-card reveal">
         <div class="hl-label">Industry</div>
-        <div class="hl-title">3x Intern at Collins Aerospace · RTX Corporation</div>
+        <div class="hl-title">Collins Aerospace · RTX</div>
+        <div class="hl-sub">
+          Systems / Software Engineering Intern across 3 consecutive
+          summers, working on certified avionics software for
+          Bombardier &amp; Airbus aircraft.
+        </div>
         <div class="hl-tags">
           <span class="hl-tag">DO-178B</span>
           <span class="hl-tag">FMS / HMI</span>
+          <span class="hl-tag">3× Internships</span>
           <span class="hl-tag">Python Testing</span>
         </div>
       </div>
@@ -1499,11 +1487,17 @@
       <!-- Card 2: Honeywell + NASA -->
       <div class="highlight-card reveal">
         <div class="hl-label">Research</div>
-        <div class="hl-title">Honeywell Aerospace</div>
+        <div class="hl-title">Honeywell &amp; NASA</div>
+        <div class="hl-sub">
+          Led APU noise reduction research with Honeywell Aerospace
+          and spearheaded structural design for a lunar sampling
+          rover in NASA RASC-AL.
+        </div>
         <div class="hl-tags">
           <span class="hl-tag">Aeroacoustics</span>
-          <span class="hl-tag">APU Noise Reduction</span>
+          <span class="hl-tag">Lunar Rover</span>
           <span class="hl-tag">Project Lead</span>
+          <span class="hl-tag">6 Projects</span>
         </div>
       </div>
 
@@ -1511,11 +1505,33 @@
       <div class="highlight-card reveal">
         <div class="hl-label">Personal Projects</div>
         <div class="hl-title">Live Space Systems</div>
+        <div class="hl-sub">
+          Built a real-time 3D satellite tracking system using
+          SGP4 propagation and a CubeSat simulation with
+          autonomous FDIR fault recovery logic.
+        </div>
         <div class="hl-tags">
           <span class="hl-tag">SGP4 / TLE</span>
           <span class="hl-tag">FDIR Logic</span>
           <span class="hl-tag">Python &amp; JS</span>
-          <span class="hl-tag">Live Tracker</span>
+          <span class="hl-tag">Live Demo</span>
+        </div>
+      </div>
+
+      <!-- Card 4: Leadership -->
+      <div class="highlight-card reveal">
+        <div class="hl-label">Leadership &amp; Outreach</div>
+        <div class="hl-title">15,000+ Students</div>
+        <div class="hl-sub">
+          TA for FSE 100, SPARKS STEM Ambassador, Community
+          Assistant, and Gold Guide — mentoring and welcoming
+          students at ASU.
+        </div>
+        <div class="hl-tags">
+          <span class="hl-tag">Teaching</span>
+          <span class="hl-tag">STEM Mentor</span>
+          <span class="hl-tag">Gold Guide</span>
+          <span class="hl-tag">Community</span>
         </div>
       </div>
 
@@ -1530,7 +1546,7 @@
     <div class="section-inner">
 
       <div class="section-header reveal">
-        <span class="section-tag">02 — Education</span>
+        <span class="section-tag">01 — Education</span>
         <div class="section-line"></div>
       </div>
 
@@ -1566,7 +1582,7 @@
     <div class="section-inner">
 
       <div class="section-header reveal">
-        <span class="section-tag">03 — Industry Experience</span>
+        <span class="section-tag">02 — Industry Experience</span>
         <div class="section-line"></div>
       </div>
 
@@ -1628,7 +1644,7 @@
     <div class="section-inner">
 
       <div class="section-header reveal">
-        <span class="section-tag">04 — Research Experience</span>
+        <span class="section-tag">03 — Research Experience</span>
         <div class="section-line"></div>
       </div>
 
@@ -1761,7 +1777,7 @@
     <div class="section-inner">
 
       <div class="section-header reveal">
-        <span class="section-tag">05 — Technical Skills</span>
+        <span class="section-tag">04 — Technical Skills</span>
         <div class="section-line"></div>
       </div>
 
@@ -1839,10 +1855,12 @@
   ============================================================ -->
   <section id="projects">
     <div class="section-inner">
+
       <div class="section-header reveal">
         <span class="section-tag">05 — Personal Projects</span>
         <div class="section-line"></div>
       </div>
+
       <div class="projects-grid">
 
         <!-- Project 01: Satellite Tracker -->
@@ -1857,43 +1875,31 @@
             Originally built with a FastAPI Python backend; refactored for the web using
             satellite.js so it runs entirely in the browser. Generates telemetry-style
             outputs including latitude, longitude, altitude, and velocity for real-time
-            orbital state estimation.
-
-            <div class="project-live-divider"></div>
-            <a
-              class="project-live-link"
-              href="#hero"
-              onclick="event.stopPropagation(); smoothScrollToTracker();"
-              title="Jump to the live tracker embedded at the top of this page"
-            >
-              <span class="live-dot"></span>
-              View Live Tracker ↑
-            </a>
+            orbital state estimation. The live demo is embedded at the top of this page —
+            use the "View in New Screen" link to open the full interactive experience.
           </div>
         </div>
 
-
-      <!-- Project 02: CubeSat FDIR -->
-      <div class="project-card reveal" onclick="toggleProject(this)">
-        <div class="project-num">02</div>
-        <div class="project-title">CubeSat Simulation with FDIR Logic</div>
-        <div class="project-period">Spring 2026</div>
-        <div class="project-hint">Click to read more</div>
-        <div class="project-desc">
-          Developed a full CubeSat simulation system — AETHER-1 — integrating 
-          realistic power, thermal, ADCS, and communications subsystem models. 
-          Implemented autonomous Fault Detection, Isolation, and Recovery (FDIR) 
-          logic to identify anomalies, isolate faults, and execute recovery 
-          procedures without ground intervention. Built with Python (FastAPI backend) 
-          and a live mission dashboard frontend showing telemetry, fault alerts, 
-          and event logs in real time.
-          <div class="project-live-divider"></div>
-          <a class="project-live-link" href="cubesat/index.html" target="_blank">
-            <span class="live-dot"></span>
-            View Mission Dashboard ↗
-          </a>
+        <!-- Project 02: CubeSat FDIR -->
+        <div class="project-card reveal" onclick="toggleProject(this)">
+          <div class="project-num">02</div>
+          <div class="project-title">CubeSat Simulation with FDIR Logic</div>
+          <div class="project-period">Spring 2026</div>
+          <div class="project-hint">Click to read more</div>
+          <div class="project-desc">
+            Developed a CubeSat simulation system integrating orbital tracking with
+            simulated spacecraft telemetry and operational states. Implemented
+            Fault Detection, Isolation, and Recovery (FDIR) logic to autonomously
+            identify anomalies, isolate subsystem faults, and simulate recovery actions —
+            reducing reliance on manual ground intervention. Built in Python with a
+            backend architecture for simulating spacecraft health monitoring, anomaly
+            propagation, and automated recovery workflows.
+          </div>
         </div>
+
       </div>
+    </div>
+  </section>
 
 
   <!-- ============================================================
@@ -1903,7 +1909,7 @@
     <div class="section-inner">
 
       <div class="section-header reveal">
-        <span class="section-tag">07 — Leadership &amp; Outreach</span>
+        <span class="section-tag">06 — Leadership &amp; Outreach</span>
         <div class="section-line"></div>
       </div>
 
@@ -1988,8 +1994,8 @@
         </p>
 
         <div class="contact-links">
-          <a href="mailto:kaur.harjot.1621@gmail.com" class="contact-link">
-            <span class="icon">✉</span> hkaur33@asu.edu
+          <a href="/cdn-cgi/l/email-protection#adc6ccd8df83c5ccdfc7c2d9839c9b9f9cedcac0ccc4c183cec2c0" class="contact-link">
+            <span class="icon">✉</span> <span class="__cf_email__" data-cfemail="8be3e0eafef9b8b8cbeaf8fea5eeeffe">[email&#160;protected]</span>
           </a>
           <a href="https://www.linkedin.com/in/harjottkaurr/" target="_blank" class="contact-link">
             <span class="icon">🔗</span> LinkedIn
@@ -2092,29 +2098,188 @@
     resize();
     window.addEventListener('resize', resize);
 
-    /* create 180 random stars */
-    for (let i = 0; i < 180; i++) {
-      stars.push({
-        x:     Math.random() * 2000,
-        y:     Math.random() * 1200,
-        r:     Math.random() * 1.2 + 0.2,
-        a:     Math.random(),
-        speed: Math.random() * 0.3 + 0.05
-      });
+    /* ─────────────────────────────────────────────
+       STAR SYSTEM — three layers for depth:
+         Layer 0 (tiny)   — 220 distant dust stars
+         Layer 1 (medium) — 80  mid-field stars
+         Layer 2 (large)  — 25  bright foreground stars
+                             8  special "sparkle" stars
+       Each star has: position, radius, phase, speed,
+       layer, and a parallax multiplier.
+    ───────────────────────────────────────────── */
+
+    /* Brown/warm palette — stays on-brand */
+    const STAR_COLORS = [
+      '139, 69, 19',   /* saddle brown  */
+      '160, 82, 45',   /* sienna        */
+      '205, 133, 63',  /* tan / warm    */
+      '180, 110, 60',  /* mid brown     */
+      '210, 160, 100', /* light warm    */
+    ];
+
+    /* Seed the three layers */
+    function seedStars() {
+      stars = [];
+
+      /* Layer 0 — tiny distant stars */
+      for (let i = 0; i < 220; i++) {
+        stars.push({
+          x:          Math.random(),   /* 0–1 normalized */
+          y:          Math.random(),
+          r:          Math.random() * 0.8 + 0.3,
+          phase:      Math.random() * Math.PI * 2,
+          speed:      Math.random() * 0.4 + 0.15,
+          layer:      0,
+          parallax:   0.02,
+          color:      STAR_COLORS[Math.floor(Math.random() * STAR_COLORS.length)],
+          maxOpacity: Math.random() * 0.22 + 0.08,
+        });
+      }
+
+      /* Layer 1 — medium stars */
+      for (let i = 0; i < 80; i++) {
+        stars.push({
+          x:          Math.random(),
+          y:          Math.random(),
+          r:          Math.random() * 1.2 + 0.8,
+          phase:      Math.random() * Math.PI * 2,
+          speed:      Math.random() * 0.3 + 0.1,
+          layer:      1,
+          parallax:   0.06,
+          color:      STAR_COLORS[Math.floor(Math.random() * STAR_COLORS.length)],
+          maxOpacity: Math.random() * 0.35 + 0.15,
+        });
+      }
+
+      /* Layer 2 — bright foreground stars with glow */
+      for (let i = 0; i < 25; i++) {
+        stars.push({
+          x:          Math.random(),
+          y:          Math.random(),
+          r:          Math.random() * 2.0 + 1.5,
+          phase:      Math.random() * Math.PI * 2,
+          speed:      Math.random() * 0.25 + 0.08,
+          layer:      2,
+          parallax:   0.12,
+          color:      STAR_COLORS[Math.floor(Math.random() * STAR_COLORS.length)],
+          maxOpacity: Math.random() * 0.5 + 0.3,
+          glow:       true,
+        });
+      }
+
+      /* Special sparkle stars — cross/starburst shape */
+      for (let i = 0; i < 8; i++) {
+        stars.push({
+          x:          Math.random(),
+          y:          Math.random(),
+          r:          Math.random() * 1.5 + 2.0,
+          phase:      Math.random() * Math.PI * 2,
+          speed:      Math.random() * 0.2 + 0.06,
+          layer:      2,
+          parallax:   0.12,
+          color:      '205, 133, 63',  /* always tan — brightest */
+          maxOpacity: Math.random() * 0.4 + 0.45,
+          glow:       true,
+          sparkle:    true,
+        });
+      }
+    }
+
+    seedStars();
+
+    /* How far the page has scrolled — updated on scroll */
+    let scrollY = 0;
+    window.addEventListener('scroll', () => { scrollY = window.scrollY; }, { passive: true });
+
+    /* Draw a 4-point starburst / cross for sparkle stars */
+    function drawSparkle(cx, cy, r, opacity, color) {
+      const arms = 4;
+      ctx.save();
+      ctx.globalAlpha = opacity;
+      for (let i = 0; i < arms; i++) {
+        const angle = (i / arms) * Math.PI;
+        const len   = r * 4.5;
+        const grad  = ctx.createLinearGradient(
+          cx - Math.cos(angle) * len, cy - Math.sin(angle) * len,
+          cx + Math.cos(angle) * len, cy + Math.sin(angle) * len
+        );
+        grad.addColorStop(0,   `rgba(${color}, 0)`);
+        grad.addColorStop(0.4, `rgba(${color}, ${opacity * 0.6})`);
+        grad.addColorStop(0.5, `rgba(${color}, ${opacity})`);
+        grad.addColorStop(0.6, `rgba(${color}, ${opacity * 0.6})`);
+        grad.addColorStop(1,   `rgba(${color}, 0)`);
+        ctx.strokeStyle = grad;
+        ctx.lineWidth   = r * 0.7;
+        ctx.lineCap     = 'round';
+        ctx.beginPath();
+        ctx.moveTo(cx - Math.cos(angle) * len, cy - Math.sin(angle) * len);
+        ctx.lineTo(cx + Math.cos(angle) * len, cy + Math.sin(angle) * len);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    /* Draw a glowing star with soft radial halo */
+    function drawGlow(cx, cy, r, opacity, color) {
+      const halo = ctx.createRadialGradient(cx, cy, 0, cx, cy, r * 5);
+      halo.addColorStop(0,   `rgba(${color}, ${opacity})`);
+      halo.addColorStop(0.3, `rgba(${color}, ${opacity * 0.5})`);
+      halo.addColorStop(1,   `rgba(${color}, 0)`);
+      ctx.beginPath();
+      ctx.arc(cx, cy, r * 5, 0, Math.PI * 2);
+      ctx.fillStyle = halo;
+      ctx.fill();
     }
 
     function drawStars() {
       ctx.clearRect(0, 0, W, H);
+
       stars.forEach(s => {
-        s.a += s.speed * 0.005;
-        const opacity = (Math.sin(s.a) + 1) / 2 * 0.18 + 0.03;
-        ctx.beginPath();
-        ctx.arc(s.x % W, s.y % H, s.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(139, 69, 19, ${opacity})`;
-        ctx.fill();
+        /* Advance the twinkle phase */
+        s.phase += s.speed * 0.006;
+
+        /* Smooth sine-wave opacity — natural twinkle */
+        const t       = (Math.sin(s.phase) + 1) / 2;   /* 0 → 1 */
+        const opacity = t * s.maxOpacity;
+
+        /* Parallax: deeper layers scroll less */
+        const parallaxOffset = scrollY * s.parallax;
+
+        /* Convert 0–1 normalized positions to pixels */
+        const px = s.x * W;
+        const py = ((s.y * (H + 600) + parallaxOffset) % (H + 600)) - 300;
+
+        if (opacity < 0.005) return; /* skip invisible stars */
+
+        if (s.sparkle) {
+          /* Starburst cross */
+          drawSparkle(px, py, s.r, opacity, s.color);
+          /* Also draw a small solid core */
+          ctx.beginPath();
+          ctx.arc(px, py, s.r * 0.6, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${s.color}, ${opacity})`;
+          ctx.fill();
+
+        } else if (s.glow) {
+          /* Soft glowing halo + solid core */
+          drawGlow(px, py, s.r, opacity * 0.45, s.color);
+          ctx.beginPath();
+          ctx.arc(px, py, s.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${s.color}, ${opacity})`;
+          ctx.fill();
+
+        } else {
+          /* Plain small star */
+          ctx.beginPath();
+          ctx.arc(px, py, s.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${s.color}, ${opacity})`;
+          ctx.fill();
+        }
       });
+
       requestAnimationFrame(drawStars);
     }
+
     drawStars();
 
 
@@ -2149,4 +2314,3 @@
 
 </body>
 </html>
-
