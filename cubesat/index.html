@@ -1,1527 +1,2298 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AETHER-1 — Mission Control</title>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Harjot Kaur — Aerospace Engineer</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
+
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    /* ============================================================
+       COLOR VARIABLES — change your colors here in one place
+    ============================================================ */
     :root {
-      --bg:        #F2F4F7;
-      --surface:   #FFFFFF;
-      --surface2:  #F7F8FA;
-      --border:    #DDE1E9;
-      --border-m:  #BCC3CF;
-      --text-1:    #0F1724;
-      --text-2:    #4A5568;
-      --text-3:    #8896A8;
-      --text-4:    #B0BAC8;
-
-      --nominal:   #0A7A55;
-      --nominal-bg:#E6F5EF;
-      --safe:      #B45309;
-      --safe-bg:   #FEF3C7;
-      --emergency: #B91C1C;
-      --emergency-bg:#FEE2E2;
-
-      --green:     #10B981;
-      --green-bg:  #ECFDF5;
-      --amber:     #F59E0B;
-      --amber-bg:  #FFFBEB;
-      --red:       #EF4444;
-      --red-bg:    #FEF2F2;
-      --blue:      #3B82F6;
-      --blue-bg:   #EFF6FF;
-      --purple:    #8B5CF6;
-      --purple-bg: #F5F3FF;
-
-      --mono: 'IBM Plex Mono', monospace;
-      --sans: 'IBM Plex Sans', sans-serif;
-      --rad-sm: 4px;
-      --rad:    8px;
-      --rad-lg: 12px;
-      --shadow-sm: 0 1px 3px rgba(15,23,36,0.07), 0 1px 2px rgba(15,23,36,0.05);
+      --bg:           #ffffff;       /* main background              */
+      --bg2:          #fdf6f0;       /* alternate section background */
+      --surface:      #fff8f3;       /* card background              */
+      --surface2:     #fdeee3;       /* card background variant      */
+      --accent:       #8b4513;       /* saddle brown — main color    */
+      --accent2:      #a0522d;       /* sienna — secondary           */
+      --accent3:      #cd853f;       /* tan — third accent           */
+      --text:         #2b1200;       /* primary text                 */
+      --text-muted:   #5c3317;       /* body / description text      */
+      --text-dim:     #b07850;       /* dates, labels, footer        */
+      --border:       rgba(139, 69, 19, 0.25);
+      --border2:      rgba(139, 69, 19, 0.18);
+      --glow:         rgba(139, 69, 19, 0.12);
     }
 
-    html, body {
-      height: 100%;
-      font-family: var(--sans);
+
+    /* ============================================================
+       RESET & BASE
+    ============================================================ */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
       background: var(--bg);
-      color: var(--text-1);
-      font-size: 13px;
-      line-height: 1.5;
+      color: var(--text);
+      overflow-x: hidden;
+      cursor: none;
     }
 
-    .shell {
-      display: grid;
-      grid-template-rows: 52px 1fr;
-      grid-template-columns: 220px 1fr 280px;
-      grid-template-areas:
-        "header header header"
-        "sidebar main   right";
-      height: 100vh;
-      overflow: hidden;
-    }
 
-    /* ── Header ── */
-    .header {
-      grid-area: header;
-      background: var(--text-1);
-      display: flex;
-      align-items: center;
-      padding: 0 20px;
-      gap: 16px;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-    }
-
-    .header-logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: #fff;
-    }
-
-    .header-title {
-      font-size: 14px;
-      font-weight: 600;
-      color: #fff;
-      letter-spacing: 0.05em;
-    }
-
-    .header-sub {
-      font-size: 11px;
-      color: rgba(255,255,255,0.45);
-      font-family: var(--mono);
-      letter-spacing: 0.04em;
-    }
-
-    .header-divider {
-      width: 1px;
-      height: 24px;
-      background: rgba(255,255,255,0.12);
-    }
-
-    .mode-badge {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 12px;
-      border-radius: 100px;
-      font-size: 11px;
-      font-weight: 600;
-      font-family: var(--mono);
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      transition: all 0.3s;
-    }
-
-    .mode-badge.nominal   { background: var(--nominal-bg);   color: var(--nominal);   }
-    .mode-badge.safe      { background: var(--safe-bg);      color: var(--safe);      }
-    .mode-badge.emergency { background: var(--emergency-bg); color: var(--emergency); }
-
-    .mode-dot {
-      width: 7px; height: 7px;
+    /* ============================================================
+       CUSTOM CURSOR
+    ============================================================ */
+    .cursor {
+      width: 10px;
+      height: 10px;
+      background: var(--text);
       border-radius: 50%;
-      background: currentColor;
-      animation: pulse-dot 2s infinite;
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 9999;
     }
 
-    @keyframes pulse-dot {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.35; }
+    .cursor-ring {
+      width: 36px;
+      height: 36px;
+      border: 1.5px solid var(--text);
+      border-radius: 50%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 9998;
+      opacity: 0.5;
+      transition: all 0.18s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
 
-    .header-clock {
-      margin-left: auto;
-      font-family: var(--mono);
-      font-size: 12px;
-      color: rgba(255,255,255,0.5);
-      letter-spacing: 0.06em;
-    }
 
-    .header-step {
-      font-family: var(--mono);
-      font-size: 11px;
-      color: rgba(255,255,255,0.35);
-    }
-
-    .js-badge {
-      font-family: var(--mono);
-      font-size: 10px;
-      padding: 3px 8px;
-      border-radius: 100px;
-      background: rgba(59,130,246,0.2);
-      color: #93C5FD;
-      letter-spacing: 0.06em;
-    }
-
-    /* ── Sidebar ── */
-    .sidebar {
-      grid-area: sidebar;
-      background: var(--surface);
-      border-right: 1px solid var(--border);
-      overflow-y: auto;
-      padding: 16px 0;
-    }
-
-    .sidebar-section {
-      padding: 0 14px;
-      margin-bottom: 20px;
-    }
-
-    .sidebar-label {
-      font-size: 9px;
-      font-weight: 600;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--text-4);
-      margin-bottom: 8px;
-      padding: 0 2px;
-    }
-
-    .vital-card {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: var(--rad);
-      padding: 10px 12px;
-      margin-bottom: 6px;
-    }
-
-    .vital-row {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      margin-bottom: 4px;
-    }
-
-    .vital-name {
-      font-size: 11px;
-      color: var(--text-3);
-      font-weight: 500;
-    }
-
-    .vital-value {
-      font-family: var(--mono);
-      font-size: 15px;
-      font-weight: 500;
-      color: var(--text-1);
-      transition: color 0.3s;
-    }
-
-    .vital-unit {
-      font-size: 10px;
-      color: var(--text-3);
-      margin-left: 2px;
-    }
-
-    .vital-bar-track {
-      height: 3px;
-      background: var(--border);
-      border-radius: 2px;
-      overflow: hidden;
-      margin-top: 4px;
-    }
-
-    .vital-bar-fill {
+    /* ============================================================
+       STAR FIELD CANVAS (background)
+    ============================================================ */
+    canvas#stars {
+      position: fixed;
+      inset: 0;
+      width: 100%;
       height: 100%;
-      border-radius: 2px;
-      transition: width 0.5s ease, background 0.3s;
+      z-index: 0;
+      opacity: 1;
+      pointer-events: none;
     }
 
-    .status-row {
+
+    /* ============================================================
+       NAVIGATION BAR
+    ============================================================ */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 20px 60px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 5px 0;
-      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(139, 69, 19, 0.15);
+      background: rgba(255, 250, 245, 0.92);
     }
 
-    .status-row:last-child { border-bottom: none; }
+    .nav-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.1rem;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      text-decoration: none;
+    }
 
-    .status-label { font-size: 11px; color: var(--text-2); }
-
-    .status-indicator {
+    .nav-links {
       display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 11px;
-      font-weight: 500;
+      gap: 28px;
+      list-style: none;
     }
 
-    .dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-
-    .dot.green  { background: var(--green); }
-    .dot.amber  { background: var(--amber); }
-    .dot.red    { background: var(--red); box-shadow: 0 0 0 2px rgba(239,68,68,0.2); }
-    .dot.grey   { background: var(--text-4); }
-    .dot.pulse  { animation: pulse-dot 1.5s infinite; }
-
-    /* ── Main ── */
-    .main {
-      grid-area: main;
-      overflow-y: auto;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .metric-row {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-    }
-
-    .metric-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--rad-lg);
-      padding: 14px 16px;
-      box-shadow: var(--shadow-sm);
+    .nav-links a {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      transition: color 0.2s;
       position: relative;
-      overflow: hidden;
     }
 
-    .metric-card::before {
+    /* underline slide-in on hover */
+    .nav-links a::after {
       content: '';
       position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 3px;
-      background: var(--accent, var(--border));
-      border-radius: var(--rad-lg) var(--rad-lg) 0 0;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background: var(--accent);
+      transition: width 0.3s;
     }
 
-    .metric-card.power   { --accent: var(--amber); }
-    .metric-card.thermal { --accent: var(--red); }
-    .metric-card.comms   { --accent: var(--blue); }
-    .metric-card.adcs    { --accent: var(--purple); }
-
-    .metric-label {
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--text-3);
-      margin-bottom: 6px;
+    .nav-links a:hover {
+      color: var(--accent);
     }
 
-    .metric-value {
-      font-family: var(--mono);
-      font-size: 26px;
-      font-weight: 500;
-      color: var(--text-1);
-      line-height: 1;
-      margin-bottom: 4px;
-      transition: color 0.3s;
+    .nav-links a:hover::after {
+      width: 100%;
     }
 
-    .metric-sub { font-size: 11px; color: var(--text-3); }
 
-    .charts-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
+    /* all sections sit above the canvas */
+    section {
+      position: relative;
+      z-index: 1;
     }
 
-    .chart-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--rad-lg);
-      padding: 14px 16px;
-      box-shadow: var(--shadow-sm);
-    }
 
-    .chart-header {
+    /* ============================================================
+       HERO SECTION
+    ============================================================ */
+    #hero {
+      min-height: 100vh;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      margin-bottom: 12px;
-    }
-
-    .chart-title {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-2);
-    }
-
-    .chart-badge {
-      font-size: 10px;
-      font-family: var(--mono);
-      padding: 2px 8px;
-      border-radius: 100px;
-      border: 1px solid var(--border);
-      color: var(--text-3);
-    }
-
-    .chart-canvas-wrap {
+      padding: 120px 60px 80px;
       position: relative;
-      height: 110px;
+      overflow: hidden;
+      background: linear-gradient(135deg, #ffffff 60%, #fdeee3 100%);
     }
 
-    .orbit-card {
-      background: var(--surface);
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* "Kosmosliebhaberin" pill badge */
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(139, 69, 19, 0.08);
+      border: 1px solid rgba(139, 69, 19, 0.25);
+      border-radius: 100px;
+      padding: 6px 16px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--accent);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    /* pulsing dot inside badge */
+    .hero-badge .dot {
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.4; transform: scale(0.7); }
+    }
+
+    /* tooltip appears when hovering over "Kosmosliebhaberin" */
+    .badge-word {
+      position: relative;
+      cursor: default;
+    }
+
+    .badge-word::after {
+      content: 'Lover of the Cosmos';
+      position: absolute;
+      bottom: calc(100% + 10px);
+      left: 50%;
+      transform: translateX(-50%) translateY(4px);
+      background: var(--accent);
+      color: #ffffff;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+      padding: 6px 14px;
+      border-radius: 6px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      z-index: 200;
+    }
+
+    /* small downward arrow under tooltip */
+    .badge-word::before {
+      content: '';
+      position: absolute;
+      bottom: calc(100% + 4px);
+      left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-top-color: var(--accent);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      z-index: 200;
+    }
+
+    .badge-word:hover::after {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .badge-word:hover::before {
+      opacity: 1;
+    }
+
+    /* large name */
+    .hero-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(2.8rem, 5vw, 4.5rem);
+      line-height: 1.0;
+      letter-spacing: -0.02em;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    /* "Kaur" — outlined/stroke style */
+    .hero-name .accent-line {
+      display: block;
+      color: transparent;
+      -webkit-text-stroke: 1.5px var(--accent);
+    }
+
+    .hero-title {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.9rem;
+      color: var(--accent2);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+    }
+
+    .hero-summary {
+      font-size: 1rem;
+      line-height: 1.75;
+      color: var(--text-muted);
+      max-width: 520px;
+      margin-bottom: 40px;
+    }
+
+    .hero-summary strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    /* solid saddle brown button */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--accent);
+      color: #ffffff;
+      padding: 14px 28px;
+      border-radius: 4px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: all 0.25s;
+    }
+
+    .btn-primary:hover {
+      background: #a0522d;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(139, 69, 19, 0.25);
+    }
+
+    /* outline button */
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      border: 1.5px solid rgba(139, 69, 19, 0.4);
+      color: var(--accent);
+      padding: 14px 28px;
+      border-radius: 4px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 600;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: all 0.25s;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(139, 69, 19, 0.08);
+      transform: translateY(-2px);
+    }
+
+
+    /* ============================================================
+       SATELLITE TRACKER EMBED (hero right side)
+    ============================================================ */
+    .hero-visual {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      height: auto;
+    }
+
+    .satellite-embed-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .satellite-embed-label .dot {
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    .satellite-iframe {
+      width: 100%;
+      height: 400px;
       border: 1px solid var(--border);
-      border-radius: var(--rad-lg);
-      padding: 14px 16px;
-      box-shadow: var(--shadow-sm);
+      border-radius: 12px;
+      box-shadow: 0 8px 40px rgba(139, 69, 19, 0.12);
+      background: #000;
     }
 
-    .orbit-visual {
+    .satellite-open-btn {
+      align-self: flex-end;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--accent);
+      text-decoration: none;
+      letter-spacing: 0.08em;
+      border-bottom: 1px solid rgba(139, 69, 19, 0.3);
+      padding-bottom: 2px;
+      transition: all 0.2s;
+    }
+
+    .satellite-open-btn:hover {
+      color: var(--accent2);
+      border-bottom-color: var(--accent2);
+    }
+
+
+    /* ============================================================
+       SHARED SECTION LAYOUT
+    ============================================================ */
+    .section-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 100px 60px;
+    }
+
+    .section-header {
       display: flex;
       align-items: center;
       gap: 20px;
+      margin-bottom: 60px;
     }
 
-    .orbit-stats {
+    /* e.g. "01 — Education" brown pill */
+    .section-tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: #ffffff;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      font-weight: 700;
+      background-color: #8b4513;
+      padding: 4px 12px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    /* horizontal fading line after section tag */
+    .section-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, rgba(139, 69, 19, 0.3), transparent);
+    }
+
+
+    /* ============================================================
+       HIGHLIGHTS STRIP
+       Sits between hero and education.
+       Shows key partnerships and accomplishments at a glance.
+    ============================================================ */
+    #highlights {
+      background: var(--bg);
+      border-top: 1px solid rgba(139, 69, 19, 0.08);
+      border-bottom: 1px solid rgba(139, 69, 19, 0.08);
+      position: relative;
+      z-index: 1;
+    }
+
+    .highlights-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 56px 60px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+    }
+
+    /* each card — divider lines between them via border-right */
+    .highlight-card {
+      padding: 32px 36px;
+      border-right: 1px solid rgba(139, 69, 19, 0.12);
+      position: relative;
+      transition: background 0.25s ease;
+    }
+
+    .highlight-card:last-child {
+      border-right: none;
+    }
+
+    .highlight-card:hover {
+      background: var(--surface);
+    }
+
+    /* colored top-edge accent bar — each card gets its own shade */
+    .highlight-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 36px;
+      right: 36px;
+      height: 2px;
+      border-radius: 0 0 2px 2px;
+    }
+
+    .highlight-card:nth-child(1)::before { background: var(--accent); }
+    .highlight-card:nth-child(2)::before { background: var(--accent2); }
+    .highlight-card:nth-child(3)::before { background: var(--accent3); }
+    .highlight-card:nth-child(4)::before { background: rgba(139, 69, 19, 0.35); }
+
+    /* category label e.g. "Industry" */
+    .hl-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      color: var(--text-dim);
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    /* main bold title */
+    .hl-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.15rem;
+      color: var(--text);
+      line-height: 1.2;
+      margin-bottom: 6px;
+    }
+
+    /* subtitle */
+    .hl-sub {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 18px;
+    }
+
+    /* small keyword tags at the bottom */
+    .hl-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .hl-tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      color: var(--text-muted);
+      background: rgba(139, 69, 19, 0.06);
+      border: 1px solid rgba(139, 69, 19, 0.14);
+      border-radius: 4px;
+      padding: 3px 8px;
+      letter-spacing: 0.04em;
+    }
+
+    /* responsive: 2 columns on medium screens */
+    @media (max-width: 900px) {
+      .highlights-inner {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .highlight-card:nth-child(2) {
+        border-right: none;
+      }
+
+      .highlight-card:nth-child(3) {
+        border-right: 1px solid rgba(139, 69, 19, 0.12);
+        border-top: 1px solid rgba(139, 69, 19, 0.12);
+      }
+
+      .highlight-card:nth-child(4) {
+        border-top: 1px solid rgba(139, 69, 19, 0.12);
+      }
+    }
+
+
+    /* ============================================================
+       EDUCATION SECTION
+    ============================================================ */
+    #education {
+      background: var(--bg2);
+    }
+
+    .edu-card {
+      background: #ffffff;
+      border: 1px solid rgba(139, 69, 19, 0.2);
+      border-radius: 16px;
+      padding: 40px 48px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 40px;
+      align-items: center;
+      box-shadow: 0 4px 30px rgba(139, 69, 19, 0.07);
+    }
+
+    .edu-degree {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.5rem;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .edu-school {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.82rem;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      margin-bottom: 20px;
+    }
+
+    .edu-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    /* each course/subject chip */
+    .edu-chip {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      background: rgba(139, 69, 19, 0.06);
+      border: 1px solid rgba(139, 69, 19, 0.18);
+      border-radius: 4px;
+      padding: 4px 10px;
+      letter-spacing: 0.05em;
+    }
+
+    .edu-grad {
+      text-align: right;
+    }
+
+    /* large "May 2026" date */
+    .edu-grad-date {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 2.4rem;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .edu-grad-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-top: 6px;
+    }
+
+
+    /* ============================================================
+       EXPERIENCE SECTION
+    ============================================================ */
+    #experience {
+      background: var(--bg);
+    }
+
+    .exp-card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 36px 40px;
+      background: #ffffff;
+      position: relative;
+      overflow: visible;
+      transition: all 0.3s ease;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 20px rgba(139, 69, 19, 0.06);
+    }
+
+    /* left accent stripe */
+    .exp-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 3px;
+      height: 100%;
+      background: linear-gradient(to bottom, var(--accent), var(--accent3));
+      border-radius: 3px 0 0 3px;
+    }
+
+    .exp-card:hover {
+      border-color: rgba(139, 69, 19, 0.35);
+      transform: translateX(4px);
+      box-shadow: 0 8px 40px rgba(139, 69, 19, 0.1);
+    }
+
+    .exp-meta {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .exp-company {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: var(--text);
+    }
+
+    .exp-role {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+      margin-top: 4px;
+    }
+
+    /* date pill on the right */
+    .exp-period {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--accent);
+      background: rgba(139, 69, 19, 0.07);
+      border: 1px solid rgba(139, 69, 19, 0.2);
+      padding: 5px 12px;
+      border-radius: 100px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .exp-points {
+      list-style: none;
+    }
+
+    .exp-points li {
+      position: relative;
+      padding-left: 20px;
+      margin-bottom: 10px;
+      color: var(--text-muted);
+      font-size: 0.93rem;
+      line-height: 1.65;
+    }
+
+    /* brown arrow bullet */
+    .exp-points li::before {
+      content: '▸';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-size: 0.8rem;
+    }
+
+    .exp-points li strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    /* photo inside experience card */
+    .exp-photo-wrapper {
+      margin-top: 28px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      overflow: visible;
+    }
+
+    .exp-photo {
+      display: block;
+      width: 480px;
+      height: 300px;
+      object-fit: cover;
+      object-position: center;
+      border-radius: 16px;
+      border: 2px solid rgba(139, 69, 19, 0.2);
+      box-shadow: 0 4px 16px rgba(139, 69, 19, 0.12);
+      flex-shrink: 0;
+    }
+
+    .exp-photo-caption {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--text-dim);
+      letter-spacing: 0.08em;
+      line-height: 1.6;
+    }
+
+
+    /* ============================================================
+       RESEARCH SECTION — INTERACTIVE CLICK-TO-EXPAND
+       Default: emoji, title, tag, role, date
+       Click: description slides open
+    ============================================================ */
+    #research {
+      background: var(--bg2);
+    }
+
+    .research-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 24px;
+    }
+
+    /* card is clickable */
+    .research-card {
+      background: #ffffff;
+      border: 1px solid var(--border2);
+      border-radius: 12px;
+      padding: 30px;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+      box-shadow: 0 2px 16px rgba(139, 69, 19, 0.05);
+    }
+
+    /* subtle corner glow */
+    .research-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 140px;
+      height: 140px;
+      background: radial-gradient(circle, rgba(139, 69, 19, 0.04) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .research-card:hover {
+      border-color: rgba(139, 69, 19, 0.3);
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(139, 69, 19, 0.1);
+    }
+
+    /* card stays flat when open */
+    .research-card.open {
+      border-color: rgba(139, 69, 19, 0.4);
+      box-shadow: 0 12px 40px rgba(139, 69, 19, 0.12);
+      transform: translateY(0);
+    }
+
+    /* emoji icon box */
+    .research-icon {
+      width: 44px;
+      height: 44px;
+      background: rgba(139, 69, 19, 0.08);
+      border: 1px solid rgba(139, 69, 19, 0.2);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+    }
+
+    /* affiliation capsule e.g. "NASA · RASC-AL" */
+    .research-tag {
+      display: inline-block;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: rgba(139, 69, 19, 0.07);
+      border: 1px solid rgba(139, 69, 19, 0.2);
+      border-radius: 100px;
+      padding: 3px 10px;
+      margin-bottom: 14px;
+    }
+
+    .research-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: var(--text);
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+
+    .research-role {
+      font-family: 'Syne', sans-serif;
+      font-weight: 500;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+
+    .research-org {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--accent2);
+      letter-spacing: 0.08em;
+      margin-bottom: 0;
+    }
+
+    /* "▸ Click to read more" hint */
+    .research-hint {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      letter-spacing: 0.08em;
+      margin-top: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s;
+    }
+
+    /* arrow before hint text */
+    .research-hint::before {
+      content: '▸';
+      font-size: 0.6rem;
+      transition: transform 0.3s ease;
+    }
+
+    /* arrow rotates 90° when card is open */
+    .research-card.open .research-hint::before {
+      transform: rotate(90deg);
+    }
+
+    .research-card.open .research-hint {
+      color: var(--accent);
+    }
+
+    /* description — collapsed by default, expands on click */
+    .research-desc {
+      font-size: 0.88rem;
+      line-height: 1.7;
+      color: var(--text-muted);
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      margin-top: 0;
+      transition: max-height 0.45s ease, opacity 0.35s ease, margin-top 0.3s ease;
+    }
+
+    .research-card.open .research-desc {
+      max-height: 600px;
+      opacity: 1;
+      margin-top: 16px;
+    }
+
+    .research-desc strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+
+    /* ============================================================
+       SKILLS SECTION
+    ============================================================ */
+    #skills {
+      background: var(--bg);
+    }
+
+    .skills-layout {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 24px;
+    }
+
+    .skill-group {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 16px rgba(139, 69, 19, 0.05);
+    }
+
+    .skill-group:hover {
+      border-color: rgba(139, 69, 19, 0.35);
+      box-shadow: 0 8px 30px rgba(139, 69, 19, 0.1);
+    }
+
+    /* category heading e.g. "Modeling & Design" */
+    .skill-group-title {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--text);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* short line before category title */
+    .skill-group-title::before {
+      content: '';
+      width: 18px;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    .skill-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    /* individual skill pill — no hover color change */
+    .skill-tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      background: rgba(139, 69, 19, 0.05);
+      border: 1px solid rgba(139, 69, 19, 0.15);
+      border-radius: 4px;
+      padding: 5px 11px;
+      letter-spacing: 0.05em;
+    }
+
+
+    /* ============================================================
+       PROJECTS SECTION — INTERACTIVE CLICK-TO-EXPAND
+       Same interaction pattern as research cards
+    ============================================================ */
+    #projects {
+      background: var(--bg2);
+    }
+
+    .projects-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      flex: 1;
+      gap: 24px;
     }
 
-    .orbit-stat {
-      background: var(--surface2);
+    /* clickable project card */
+    .project-card {
+      background: #ffffff;
       border: 1px solid var(--border);
-      border-radius: var(--rad);
-      padding: 8px 10px;
+      border-radius: 12px;
+      padding: 32px;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+      box-shadow: 0 2px 16px rgba(139, 69, 19, 0.05);
     }
 
-    .orbit-stat-label {
-      font-size: 10px;
-      color: var(--text-3);
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-      font-weight: 600;
-      margin-bottom: 3px;
+    .project-card:hover {
+      border-color: rgba(139, 69, 19, 0.35);
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(139, 69, 19, 0.1);
     }
 
-    .orbit-stat-value {
-      font-family: var(--mono);
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--text-1);
+    /* stays flat when open */
+    .project-card.open {
+      border-color: rgba(139, 69, 19, 0.4);
+      box-shadow: 0 12px 40px rgba(139, 69, 19, 0.12);
+      transform: translateY(0);
     }
 
-    /* ── Right Panel ── */
-    .right-panel {
-      grid-area: right;
-      background: var(--surface);
-      border-left: 1px solid var(--border);
-      overflow-y: auto;
+    /* large faded number in the corner */
+    .project-num {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 3rem;
+      color: rgba(139, 69, 19, 0.07);
+      position: absolute;
+      top: 16px;
+      right: 24px;
+      line-height: 1;
+    }
+
+    .project-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--text);
+      margin-bottom: 12px;
+      line-height: 1.3;
+    }
+
+    .project-period {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--accent2);
+      letter-spacing: 0.1em;
+      margin-bottom: 14px;
+    }
+
+    /* "▸ Click to read more" hint */
+    .project-hint {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      letter-spacing: 0.08em;
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s;
+    }
+
+    .project-hint::before {
+      content: '▸';
+      font-size: 0.6rem;
+      transition: transform 0.3s ease;
+    }
+
+    /* arrow rotates when open */
+    .project-card.open .project-hint::before {
+      transform: rotate(90deg);
+    }
+
+    .project-card.open .project-hint {
+      color: var(--accent);
+    }
+
+    /* description — collapsed by default, expands on click */
+    .project-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      margin-top: 0;
+      transition: max-height 0.45s ease, opacity 0.35s ease, margin-top 0.3s ease;
+    }
+
+    .project-card.open .project-desc {
+      max-height: 400px;
+      opacity: 1;
+      margin-top: 14px;
+    }
+
+
+    /* ============================================================
+       LEADERSHIP SECTION
+    ============================================================ */
+    #leadership {
+      background: var(--bg);
+      display: block;
+      width: 100%;
+      clear: both;
+    }
+
+    .leadership-list {
       display: flex;
       flex-direction: column;
+      gap: 16px;
     }
 
-    .panel-section {
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--border);
+    .lead-item {
+      display: grid;
+      grid-template-columns: 3px 1fr auto;
+      gap: 24px;
+      align-items: start;
+      padding: 24px 0;
+      border-bottom: 1px solid rgba(139, 69, 19, 0.1);
     }
 
-    .panel-title {
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--text-3);
-      margin-bottom: 10px;
-    }
-
-    .fault-list { display: flex; flex-direction: column; gap: 6px; }
-
-    .fault-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-      padding: 8px 10px;
-      border-radius: var(--rad);
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      animation: fault-in 0.3s ease;
-    }
-
-    @keyframes fault-in {
-      from { opacity: 0; transform: translateX(8px); }
-      to   { opacity: 1; transform: none; }
-    }
-
-    .fault-item.critical { background: var(--emergency-bg); border-color: #FECACA; }
-    .fault-item.warning  { background: var(--safe-bg);      border-color: #FDE68A; }
-    .fault-item.caution  { background: var(--blue-bg);      border-color: #BFDBFE; }
-
-    .fault-severity {
-      font-size: 9px;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      margin-top: 1px;
-    }
-
-    .fault-severity.critical { color: var(--red); }
-    .fault-severity.warning  { color: var(--amber); }
-    .fault-severity.caution  { color: var(--blue); }
-
-    .fault-type {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-1);
-      font-family: var(--mono);
-    }
-
-    .fault-desc { font-size: 11px; color: var(--text-2); margin-top: 1px; }
-    .fault-sub  { font-size: 10px; color: var(--text-3); font-family: var(--mono); }
-
-    .no-faults {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px;
-      background: var(--green-bg);
-      border: 1px solid #A7F3D0;
-      border-radius: var(--rad);
-      font-size: 12px;
-      color: var(--nominal);
-      font-weight: 500;
-    }
-
-    .event-log { display: flex; flex-direction: column; gap: 2px; }
-
-    .event-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-      padding: 5px 0;
-      border-bottom: 1px solid var(--border);
-      animation: log-in 0.25s ease;
-    }
-
-    @keyframes log-in {
-      from { opacity: 0; }
-      to   { opacity: 1; }
-    }
-
-    .event-step {
-      font-family: var(--mono);
-      font-size: 10px;
-      color: var(--text-4);
-      min-width: 32px;
-      padding-top: 1px;
-    }
-
-    .event-kind {
-      font-size: 9px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      padding: 2px 6px;
+    /* vertical brown gradient line on left */
+    .lead-line {
+      width: 3px;
+      height: 100%;
+      min-height: 40px;
+      background: linear-gradient(to bottom, var(--accent), transparent);
       border-radius: 3px;
-      flex-shrink: 0;
-      margin-top: 1px;
     }
 
-    .event-kind.FAULT    { background: var(--emergency-bg); color: var(--red); }
-    .event-kind.RESOLVED { background: var(--green-bg);     color: var(--nominal); }
-    .event-kind.RECOVERY { background: var(--green-bg);     color: var(--nominal); }
-    .event-kind.NOMINAL  { background: var(--green-bg);     color: var(--nominal); }
-    .event-kind.ORBIT    { background: var(--blue-bg);      color: var(--blue); }
-    .event-kind.COMMAND  { background: var(--purple-bg);    color: var(--purple); }
+    .lead-role {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
 
-    .event-detail { font-size: 11px; color: var(--text-2); line-height: 1.4; }
+    .lead-org {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+    }
 
-    .controls { display: flex; flex-direction: column; gap: 6px; }
+    .lead-desc {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
 
-    .ctrl-btn {
+    /* date on the right */
+    .lead-period {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--text-dim);
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+      text-align: right;
+      padding-top: 4px;
+    }
+
+
+    /* ============================================================
+       CONTACT SECTION
+    ============================================================ */
+    #contact {
+      background: var(--bg2);
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .contact-inner {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 100px 60px;
+    }
+
+    .contact-heading {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+      color: var(--accent);
+    }
+
+    /* "Connect" — outlined stroke style */
+    .contact-heading .stroke {
+      color: transparent;
+      -webkit-text-stroke: 1.5px var(--accent);
+    }
+
+    .contact-sub {
+      color: var(--text-muted);
+      font-size: 1rem;
+      line-height: 1.7;
+      margin-bottom: 40px;
+    }
+
+    .contact-links {
       display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: var(--rad);
-      font-family: var(--sans);
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--text-2);
-      cursor: pointer;
-      transition: all 0.15s;
-      text-align: left;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
     }
 
-    .ctrl-btn:hover {
-      background: var(--surface);
-      border-color: var(--border-m);
-      color: var(--text-1);
-      box-shadow: var(--shadow-sm);
-    }
-
-    .ctrl-btn:active { transform: scale(0.98); }
-
-    .ctrl-btn.danger {
-      color: var(--red);
-      border-color: #FECACA;
-      background: var(--emergency-bg);
-    }
-
-    .speed-row {
-      display: flex;
+    .contact-link {
+      display: inline-flex;
       align-items: center;
       gap: 10px;
-      margin-top: 10px;
-    }
-
-    .speed-label { font-size: 11px; color: var(--text-3); min-width: 60px; }
-    .speed-btns  { display: flex; gap: 4px; }
-
-    .speed-btn {
-      padding: 3px 10px;
-      font-size: 11px;
-      font-family: var(--mono);
+      background: #ffffff;
       border: 1px solid var(--border);
-      border-radius: var(--rad-sm);
-      background: transparent;
-      color: var(--text-3);
-      cursor: pointer;
-      transition: all 0.15s;
+      border-radius: 8px;
+      padding: 16px 26px;
+      text-decoration: none;
+      color: var(--text-muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      transition: all 0.25s;
+      box-shadow: 0 2px 12px rgba(139, 69, 19, 0.06);
     }
 
-    .speed-btn:hover { border-color: var(--border-m); color: var(--text-1); }
-    .speed-btn.active { background: var(--text-1); border-color: var(--text-1); color: #fff; }
+    /* hover fills button brown */
+    .contact-link:hover {
+      color: #ffffff;
+      background: var(--accent);
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(139, 69, 19, 0.2);
+    }
 
+    .contact-link .icon {
+      font-size: 1.1rem;
+    }
+
+
+    /* ============================================================
+       FOOTER
+    ============================================================ */
+    footer {
+      position: relative;
+      z-index: 1;
+      padding: 30px 60px;
+      border-top: 1px solid rgba(139, 69, 19, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg);
+    }
+
+    footer p {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+    }
+
+    footer .footer-accent {
+      color: var(--accent);
+    }
+
+
+    /* ============================================================
+       SCROLL REVEAL ANIMATION
+       Elements with class "reveal" fade in when scrolled into view
+    ============================================================ */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+
+    /* ============================================================
+       SCROLLBAR
+    ============================================================ */
     ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: rgba(139, 69, 19, 0.3); border-radius: 2px; }
 
-    @media (max-width: 1100px) {
-      .shell { grid-template-columns: 190px 1fr 240px; }
-      .metric-row { grid-template-columns: 1fr 1fr; }
+
+    /* ============================================================
+       MOBILE RESPONSIVE
+    ============================================================ */
+    /* Force all grid sections to single column below 900px */
+    @media (max-width: 900px) {
+      .projects-grid    { grid-template-columns: 1fr; }
+      .highlights-inner { grid-template-columns: repeat(2, 1fr); }
     }
+
+    @media (max-width: 768px) {
+      nav               { padding: 16px 24px; }
+      .nav-links        { display: none; }
+      .hero-grid        { grid-template-columns: 1fr; }
+      .hero-visual      { display: none; }
+      .section-inner    { padding: 70px 24px; }
+      .projects-grid    { grid-template-columns: 1fr; }
+      .edu-card         { grid-template-columns: 1fr; }
+      footer            { flex-direction: column; gap: 8px; text-align: center; }
+      #hero             { padding: 100px 24px 60px; }
+      .highlights-inner { grid-template-columns: 1fr; padding: 32px 24px; }
+      .highlight-card   { border-right: none; border-bottom: 1px solid rgba(139, 69, 19, 0.12); }
+      .highlight-card:last-child { border-bottom: none; }
+      .contact-inner    { padding: 60px 24px; }
+      .exp-photo        { width: 100%; height: 200px; }
+    }
+
   </style>
 </head>
 <body>
-<div class="shell">
 
-  <!-- ── Header ── -->
-  <header class="header">
-    <div class="header-logo">
-      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-        <rect x="11" y="8"  width="6" height="12" rx="1.5" fill="rgba(255,255,255,0.9)"/>
-        <rect x="2"  y="12" width="8" height="4"  rx="1"   fill="rgba(255,255,255,0.6)"/>
-        <rect x="18" y="12" width="8" height="4"  rx="1"   fill="rgba(255,255,255,0.6)"/>
-        <circle cx="14" cy="14" r="2" fill="rgba(255,255,255,0.4)"/>
-      </svg>
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+  <canvas id="stars"></canvas>
+
+
+  <!-- ============================================================
+       NAVIGATION
+  ============================================================ -->
+  <nav>
+    <a href="#hero" class="nav-logo">:harj:</a>
+    <ul class="nav-links">
+      <li><a href="#highlights">Highlights</a></li>
+      <li><a href="#education">Education</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="#research">Research</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+
+  <!-- ============================================================
+       HERO
+  ============================================================ -->
+  <section id="hero">
+    <div class="hero-grid">
+
+      <!-- Left: text content -->
       <div>
-        <div class="header-title">AETHER-1</div>
-        <div class="header-sub">AX-2024-001 · LEO 550 km · 437.1 MHz</div>
+        <div class="hero-badge">
+          <span class="dot"></span>
+          <span class="badge-word">Kosmosliebhaberin</span>
+        </div>
+
+        <h1 class="hero-name">
+          Harjot
+          <span class="accent-line">Kaur</span>
+        </h1>
+
+        <p class="hero-title">Aerospace Engineer · Astronautics</p>
+
+        <p class="hero-summary">
+          Undergraduate Aerospace Engineer with research experience in
+          <strong>aeroacoustics, systems integration</strong>, and
+          <strong>futuristic aerospace technologies</strong>. Led collaborative
+          research with <strong>Honeywell Aerospace</strong> on APU noise reduction
+          and acoustic liner design. Built systems verification and flight management
+          systems expertise through work at
+          <strong>Collins Aerospace / RTX Corporation</strong>.
+        </p>
+
+        <div class="hero-cta">
+          <a href="#experience" class="btn-primary">View Experience →</a>
+          <a href="https://www.linkedin.com/in/harjottkaurr/" target="_blank" class="btn-secondary">LinkedIn ↗</a>
+        </div>
       </div>
+
+      <!-- Right: live satellite tracker embed -->
+      <div class="hero-visual">
+        <div class="satellite-embed-label">
+          <span class="dot"></span>
+          Live 3D Satellite Orbit Tracker
+        </div>
+
+        <iframe
+          src="satellite/index.html"
+          class="satellite-iframe"
+          title="Real-Time 3D Satellite Orbit Tracking System"
+          loading="lazy"
+          scrolling="no"
+        ></iframe>
+
+        <a href="satellite/index.html" target="_blank" class="satellite-open-btn">
+          View in New Screen ↗
+        </a>
+      </div>
+
     </div>
+  </section>
 
-    <div class="header-divider"></div>
 
-    <div class="mode-badge nominal" id="mode-badge">
-      <div class="mode-dot"></div>
-      <span id="mode-text">NOMINAL</span>
+  <!-- ============================================================
+       HIGHLIGHTS STRIP
+       Key partnerships and accomplishments at a glance.
+       Sits between hero and education.
+  ============================================================ -->
+  <section id="highlights">
+    <div class="highlights-inner">
+
+      <!-- Card 1: Collins Aerospace -->
+      <div class="highlight-card reveal">
+        <div class="hl-label">Industry</div>
+        <div class="hl-title">Collins Aerospace · RTX</div>
+        <div class="hl-sub">
+          Systems / Software Engineering Intern across 3 consecutive
+          summers, working on certified avionics software for
+          Bombardier &amp; Airbus aircraft.
+        </div>
+        <div class="hl-tags">
+          <span class="hl-tag">DO-178B</span>
+          <span class="hl-tag">FMS / HMI</span>
+          <span class="hl-tag">3× Internships</span>
+          <span class="hl-tag">Python Testing</span>
+        </div>
+      </div>
+
+      <!-- Card 2: Honeywell + NASA -->
+      <div class="highlight-card reveal">
+        <div class="hl-label">Research</div>
+        <div class="hl-title">Honeywell &amp; NASA</div>
+        <div class="hl-sub">
+          Led APU noise reduction research with Honeywell Aerospace
+          and spearheaded structural design for a lunar sampling
+          rover in NASA RASC-AL.
+        </div>
+        <div class="hl-tags">
+          <span class="hl-tag">Aeroacoustics</span>
+          <span class="hl-tag">Lunar Rover</span>
+          <span class="hl-tag">Project Lead</span>
+          <span class="hl-tag">6 Projects</span>
+        </div>
+      </div>
+
+      <!-- Card 3: Personal Projects -->
+      <div class="highlight-card reveal">
+        <div class="hl-label">Personal Projects</div>
+        <div class="hl-title">Live Space Systems</div>
+        <div class="hl-sub">
+          Built a real-time 3D satellite tracking system using
+          SGP4 propagation and a CubeSat simulation with
+          autonomous FDIR fault recovery logic.
+        </div>
+        <div class="hl-tags">
+          <span class="hl-tag">SGP4 / TLE</span>
+          <span class="hl-tag">FDIR Logic</span>
+          <span class="hl-tag">Python &amp; JS</span>
+          <span class="hl-tag">Live Demo</span>
+        </div>
+      </div>
+
+      <!-- Card 4: Leadership -->
+      <div class="highlight-card reveal">
+        <div class="hl-label">Leadership &amp; Outreach</div>
+        <div class="hl-title">15,000+ Students</div>
+        <div class="hl-sub">
+          TA for FSE 100, SPARKS STEM Ambassador, Community
+          Assistant, and Gold Guide — mentoring and welcoming
+          students at ASU.
+        </div>
+        <div class="hl-tags">
+          <span class="hl-tag">Teaching</span>
+          <span class="hl-tag">STEM Mentor</span>
+          <span class="hl-tag">Gold Guide</span>
+          <span class="hl-tag">Community</span>
+        </div>
+      </div>
+
     </div>
-
-    <span class="js-badge">JS ENGINE · NO BACKEND</span>
-
-    <div class="header-clock" id="clock">--:--:-- UTC</div>
-    <div class="header-step" id="step-label">STEP 0000</div>
-  </header>
+  </section>
 
 
-  <!-- ── Sidebar ── -->
-  <aside class="sidebar">
+  <!-- ============================================================
+       EDUCATION
+  ============================================================ -->
+  <section id="education">
+    <div class="section-inner">
 
-    <div class="sidebar-section">
-      <div class="sidebar-label">Power · EPS</div>
-      <div class="vital-card">
-        <div class="vital-row">
-          <span class="vital-name">Battery</span>
-          <span><span class="vital-value" id="sb-battery">85.0</span><span class="vital-unit">%</span></span>
-        </div>
-        <div class="vital-bar-track">
-          <div class="vital-bar-fill" id="sb-battery-bar" style="width:85%;background:var(--green)"></div>
-        </div>
+      <div class="section-header reveal">
+        <span class="section-tag">01 — Education</span>
+        <div class="section-line"></div>
       </div>
-      <div class="vital-card">
-        <div class="vital-row">
-          <span class="vital-name">Power Draw</span>
-          <span><span class="vital-value" id="sb-power">—</span><span class="vital-unit">W</span></span>
-        </div>
-      </div>
-    </div>
 
-    <div class="sidebar-section">
-      <div class="sidebar-label">Thermal</div>
-      <div class="vital-card">
-        <div class="vital-row">
-          <span class="vital-name">Temperature</span>
-          <span><span class="vital-value" id="sb-temp">22.0</span><span class="vital-unit">°C</span></span>
-        </div>
-        <div class="vital-bar-track">
-          <div class="vital-bar-fill" id="sb-temp-bar" style="width:50%;background:var(--amber)"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="sidebar-section">
-      <div class="sidebar-label">Subsystem Status</div>
-      <div class="vital-card" style="padding:8px 12px">
-        <div class="status-row">
-          <span class="status-label">EPS</span>
-          <div class="status-indicator" id="st-eps"><div class="dot green"></div><span>Nominal</span></div>
-        </div>
-        <div class="status-row">
-          <span class="status-label">Thermal</span>
-          <div class="status-indicator" id="st-thermal"><div class="dot green"></div><span>Nominal</span></div>
-        </div>
-        <div class="status-row">
-          <span class="status-label">ADCS</span>
-          <div class="status-indicator" id="st-adcs"><div class="dot green"></div><span>Nominal</span></div>
-        </div>
-        <div class="status-row">
-          <span class="status-label">Comms</span>
-          <div class="status-indicator" id="st-comms"><div class="dot green"></div><span>Nominal</span></div>
-        </div>
-        <div class="status-row">
-          <span class="status-label">Payload</span>
-          <div class="status-indicator" id="st-payload"><div class="dot green"></div><span>Active</span></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="sidebar-section">
-      <div class="sidebar-label">Orbit</div>
-      <div class="vital-card" style="padding:8px 12px">
-        <div class="status-row">
-          <span class="status-label">Orbit #</span>
-          <span class="status-indicator" style="font-family:var(--mono);font-size:12px" id="sb-orbit">1</span>
-        </div>
-        <div class="status-row">
-          <span class="status-label">Sunlight</span>
-          <div class="status-indicator" id="st-sun"><div class="dot green"></div><span>Illuminated</span></div>
-        </div>
-        <div class="status-row">
-          <span class="status-label">Ground Cxn</span>
-          <div class="status-indicator" id="st-ground"><div class="dot green"></div><span>Acquired</span></div>
-        </div>
-      </div>
-    </div>
-
-  </aside>
-
-
-  <!-- ── Main ── -->
-  <main class="main">
-
-    <div class="metric-row">
-      <div class="metric-card power">
-        <div class="metric-label">Battery SOC</div>
-        <div class="metric-value" id="m-battery">85.0<span style="font-size:16px">%</span></div>
-        <div class="metric-sub" id="m-solar-status">Solar charging active</div>
-      </div>
-      <div class="metric-card thermal">
-        <div class="metric-label">Temperature</div>
-        <div class="metric-value" id="m-temp">22.0<span style="font-size:16px">°C</span></div>
-        <div class="metric-sub" id="m-heater-status">Heater off</div>
-      </div>
-      <div class="metric-card comms">
-        <div class="metric-label">Link Quality</div>
-        <div class="metric-value" id="m-link">92<span style="font-size:16px">%</span></div>
-        <div class="metric-sub" id="m-packets">↑0 ↓0 packets</div>
-      </div>
-      <div class="metric-card adcs">
-        <div class="metric-label">Pointing Error</div>
-        <div class="metric-value" id="m-point">0.30<span style="font-size:14px">°</span></div>
-        <div class="metric-sub" id="m-adcs-status">Attitude stable</div>
-      </div>
-    </div>
-
-    <div class="charts-row">
-      <div class="chart-card">
-        <div class="chart-header">
-          <span class="chart-title">Battery State of Charge</span>
-          <span class="chart-badge" id="chart-bat-latest">85.0%</span>
-        </div>
-        <div class="chart-canvas-wrap">
-          <canvas id="chart-battery"></canvas>
-        </div>
-      </div>
-      <div class="chart-card">
-        <div class="chart-header">
-          <span class="chart-title">Spacecraft Temperature</span>
-          <span class="chart-badge" id="chart-temp-latest">22.0 °C</span>
-        </div>
-        <div class="chart-canvas-wrap">
-          <canvas id="chart-temp"></canvas>
-        </div>
-      </div>
-    </div>
-
-    <div class="charts-row">
-      <div class="orbit-card">
-        <div class="chart-header">
-          <span class="chart-title">Orbital Position</span>
-          <span class="chart-badge">550 km LEO</span>
-        </div>
-        <div class="orbit-visual">
-          <div style="flex-shrink:0">
-            <svg width="120" height="120" viewBox="0 0 120 120">
-              <circle cx="60" cy="60" r="22" fill="#1D4ED8" opacity="0.15"/>
-              <circle cx="60" cy="60" r="22" fill="none" stroke="#1D4ED8" stroke-width="1" opacity="0.4"/>
-              <text x="60" y="64" text-anchor="middle" font-size="9" fill="#1D4ED8" opacity="0.8" font-family="IBM Plex Sans,sans-serif">Earth</text>
-              <!-- sunlit arc -->
-              <path id="sun-arc" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round"/>
-              <!-- eclipse arc -->
-              <path id="ecl-arc" fill="none" stroke="#374151" stroke-width="2.5" stroke-linecap="round"/>
-              <!-- orbit track -->
-              <circle cx="60" cy="60" r="44" fill="none" stroke="#BCC3CF" stroke-width="1" stroke-dasharray="3 3"/>
-              <!-- spacecraft -->
-              <g id="sat-pos">
-                <circle r="5" fill="#0F1724"/>
-                <rect x="-8" y="-2" width="4" height="4" rx="0.5" fill="#0F1724" opacity="0.6"/>
-                <rect x="4"  y="-2" width="4" height="4" rx="0.5" fill="#0F1724" opacity="0.6"/>
-              </g>
-            </svg>
-          </div>
-          <div class="orbit-stats">
-            <div class="orbit-stat">
-              <div class="orbit-stat-label">Altitude</div>
-              <div class="orbit-stat-value">550 km</div>
-            </div>
-            <div class="orbit-stat">
-              <div class="orbit-stat-label">Period</div>
-              <div class="orbit-stat-value">48 steps</div>
-            </div>
-            <div class="orbit-stat">
-              <div class="orbit-stat-label">Orbit #</div>
-              <div class="orbit-stat-value" id="orb-num">1</div>
-            </div>
-            <div class="orbit-stat">
-              <div class="orbit-stat-label">Eclipse</div>
-              <div class="orbit-stat-value" id="orb-eclipse">—</div>
-            </div>
+      <div class="edu-card reveal">
+        <div>
+          <div class="edu-degree">B.E. Aerospace Engineering (Astronautics)</div>
+          <div class="edu-school">Arizona State University · Tempe, AZ</div>
+          <div class="edu-chips">
+            <span class="edu-chip">High &amp; Low Speed Aerodynamics</span>
+            <span class="edu-chip">Orbital Mechanics</span>
+            <span class="edu-chip">Thermodynamics</span>
+            <span class="edu-chip">Rocket Propulsion</span>
+            <span class="edu-chip">Fluid Dynamics</span>
+            <span class="edu-chip">Aeroacoustics</span>
+            <span class="edu-chip">Space Systems Engineering</span>
+            <span class="edu-chip">Avionics Systems</span>
           </div>
         </div>
-      </div>
-
-      <div class="chart-card">
-        <div class="chart-header">
-          <span class="chart-title">Downlink Quality</span>
-          <span class="chart-badge" id="chart-link-latest">92%</span>
-        </div>
-        <div class="chart-canvas-wrap">
-          <canvas id="chart-link"></canvas>
+        <div class="edu-grad">
+          <div class="edu-grad-label">Graduating</div>
+          <div class="edu-grad-date">May<br/>2026</div>
         </div>
       </div>
+
     </div>
+  </section>
 
-  </main>
 
+  <!-- ============================================================
+       EXPERIENCE
+  ============================================================ -->
+  <section id="experience">
+    <div class="section-inner">
 
-  <!-- ── Right Panel ── -->
-  <aside class="right-panel">
-
-    <div class="panel-section">
-      <div class="panel-title">Active Faults</div>
-      <div class="fault-list" id="fault-list">
-        <div class="no-faults"><div class="dot green"></div>All systems nominal</div>
-      </div>
-    </div>
-
-    <div class="panel-section" style="flex:1;overflow-y:auto">
-      <div class="panel-title">Event Log</div>
-      <div class="event-log" id="event-log"></div>
-    </div>
-
-    <div class="panel-section">
-      <div class="panel-title">Ground Commands</div>
-      <div class="controls">
-        <button class="ctrl-btn" onclick="sendCmd('PAYLOAD_ON')">
-          ✓ &nbsp;Enable Payload
-        </button>
-        <button class="ctrl-btn" onclick="sendCmd('PAYLOAD_OFF')">
-          ✕ &nbsp;Disable Payload
-        </button>
-        <button class="ctrl-btn" onclick="sendCmd('ENABLE_HEATER')">
-          ↑ &nbsp;Enable Heater
-        </button>
-        <button class="ctrl-btn" onclick="sendCmd('DISABLE_HEATER')">
-          ↓ &nbsp;Disable Heater
-        </button>
-        <button class="ctrl-btn" onclick="sendCmd('STABILISE_ATTITUDE')">
-          ◎ &nbsp;Stabilise Attitude
-        </button>
-        <button class="ctrl-btn" onclick="sendCmd('ENABLE_CHARGING')">
-          ⚡ &nbsp;Force Charge
-        </button>
-        <button class="ctrl-btn danger" onclick="sendCmd('ENTER_SAFE_MODE')">
-          ⚠ &nbsp;Force Safe Mode
-        </button>
-        <button class="ctrl-btn" onclick="resetSim()">
-          ↺ &nbsp;Reset Simulation
-        </button>
+      <div class="section-header reveal">
+        <span class="section-tag">02 — Industry Experience</span>
+        <div class="section-line"></div>
       </div>
 
-      <div class="speed-row">
-        <span class="speed-label">Sim speed</span>
-        <div class="speed-btns">
-          <button class="speed-btn" onclick="setSpeed(3000, this)">0.5×</button>
-          <button class="speed-btn active" onclick="setSpeed(1500, this)">1×</button>
-          <button class="speed-btn" onclick="setSpeed(500, this)">3×</button>
-          <button class="speed-btn" onclick="setSpeed(150, this)">10×</button>
+      <div class="exp-card reveal">
+        <div class="exp-meta">
+          <div>
+            <div class="exp-company">Collins Aerospace · RTX Corporation</div>
+            <div class="exp-role">Systems / Software Engineering Intern</div>
+          </div>
+          <span class="exp-period">Summers from May 2023 – Aug 2025</span>
         </div>
+
+        <ul class="exp-points">
+          <li>
+            Contributed to design, development, and verification of
+            <strong>Flight User Interface (FUI)</strong> and
+            <strong>Human Machine Interface (HMI)</strong> for Flight Management
+            System (FMS) software for Bombardier and Airbus aircraft —
+            across three consecutive internships.
+          </li>
+          <li>
+            Completed <strong>DO-178B training</strong>, gaining expertise in
+            safety-critical software certification and the avionics software lifecycle.
+          </li>
+          <li>
+            Performed <strong>Python-based functional and high-level testing</strong>
+            to validate FMS logic and ensure compliance with certification standards.
+          </li>
+          <li>
+            Utilized <strong>JAMA, JIRA, and Confluence</strong> to manage requirements
+            traceability and defect resolution within the software development process.
+          </li>
+          <li>
+            Operated a <strong>flight-deck simulation rig</strong> to assess real-time
+            FMS behavior, developing deep understanding of cockpit workflows and
+            autonomous decision logic.
+          </li>
+        </ul>
+
+        <!-- Replace me.jpg with your actual photo filename -->
+        <div class="exp-photo-wrapper">
+          <img src="me.jpg" alt="Harjot Kaur at Collins Aerospace" class="exp-photo" />
+          <p class="exp-photo-caption">
+            Collins Aerospace<br/>
+            Cedar Rapids, IA
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       RESEARCH — click any card to expand description
+  ============================================================ -->
+  <section id="research">
+    <div class="section-inner">
+
+      <div class="section-header reveal">
+        <span class="section-tag">03 — Research Experience</span>
+        <div class="section-line"></div>
+      </div>
+
+      <div class="research-grid">
+
+        <!-- Card 1: NASA RASC-AL -->
+        <div class="research-card reveal" onclick="toggleCard(this)">
+          <div class="research-icon">🛰️</div>
+          <span class="research-tag">NASA · RASC-AL</span>
+          <div class="research-title">Lunar Sampling Rover</div>
+          <div class="research-role">Structure &amp; Communication Lead</div>
+          <div class="research-org">Fall 2025 – Present</div>
+          <div class="research-hint">Click to read more</div>
+          <div class="research-desc">
+            Led the rover structural design, subsystem integration, and communication
+            architecture to enable reliable telemetry and mission operations for a lunar
+            surface sampling rover developed for a <strong>NASA RASC-AL</strong> mission concept.
+            Developed the <strong>Lunar Isolation Sample Container (LISC)</strong>, featuring
+            a dual-wall aluminum structure, vacuum insulation, and thermal interfaces
+            designed to maintain volatile stability and structural integrity of collected
+            samples. Additionally led system-level design, CAD modeling, and trade studies
+            for sampling mechanisms, container architecture, and autonomous rover–ascent
+            vehicle sample transfer operations.
+          </div>
+        </div>
+
+        <!-- Card 2: Honeywell -->
+        <div class="research-card reveal" onclick="toggleCard(this)">
+          <div class="research-icon">🔊</div>
+          <span class="research-tag">Honeywell Aerospace</span>
+          <div class="research-title">APU Noise Reduction &amp; Acoustic Liner Design</div>
+          <div class="research-role">Project Lead &amp; Project Manager</div>
+          <div class="research-org">Spring 2025 – Fall 2025</div>
+          <div class="research-hint">Click to read more</div>
+          <div class="research-desc">
+            Conducted joint research with <strong>Honeywell Aerospace</strong> on Auxiliary
+            Power Unit (APU) noise mitigation, exploring both active and passive acoustic
+            technologies for liner optimization. Performed preliminary frequency-domain
+            analysis and source identification to characterize key APU noise contributors,
+            and collaborated with Honeywell engineers to investigate suitable material
+            selections and liner geometry configurations aimed at improving acoustic
+            absorption and overall APU noise reduction performance.
+          </div>
+        </div>
+
+        <!-- Card 3: Cube Sounder -->
+        <div class="research-card reveal" onclick="toggleCard(this)">
+          <div class="research-icon">📡</div>
+          <span class="research-tag">ASU · Systems Engineering</span>
+          <div class="research-title">Cube Sounder Balloon Mission</div>
+          <div class="research-role">Systems Engineer — Led Comms</div>
+          <div class="research-org">Spring 2025</div>
+          <div class="research-hint">Click to read more</div>
+          <div class="research-desc">
+            Defined the telecommunications and ground data subsystems while ensuring
+            compliance with NASA standards and maintaining traceability to SMART
+            requirements. Prepared and delivered <strong>System Requirements Review (SRR)</strong>
+            and <strong>Preliminary Design Review (PDR)</strong> documentation aligned with
+            mission objectives, and applied established systems engineering principles to
+            integrate payload data routing and develop a robust, reliable communication
+            architecture.
+          </div>
+        </div>
+
+        <!-- Card 4: Space Works II -->
+        <div class="research-card reveal" onclick="toggleCard(this)">
+          <div class="research-icon">📷</div>
+          <span class="research-tag">ASU · Space Works II</span>
+          <div class="research-title">Planetary Infrared Camera Shielding System</div>
+          <div class="research-role">Deputy Project Manager</div>
+          <div class="research-org">Spring 2025</div>
+          <div class="research-hint">Click to read more</div>
+          <div class="research-desc">
+            Designed a shielding system for a planetary observation payload by integrating
+            environmental sensors with an Arduino-based control system to protect
+            instrumentation from dust and radiation exposure. Utilized <strong>GD&amp;T
+            principles</strong> and <strong>Siemens NX</strong> for mechanical design of
+            the housing and integration components. Coordinated subsystem testing and
+            electrical assembly to verify operational integrity, and successfully delivered
+            both PDR and CDR documentation.
+          </div>
+        </div>
+
+        <!-- Card 5: Space Works I -->
+        <div class="research-card reveal" onclick="toggleCard(this)">
+          <div class="research-icon">🚀</div>
+          <span class="research-tag">ASU · Space Works I</span>
+          <div class="research-title">Planetary Lander — Structural Design</div>
+          <div class="research-role">ATLO Lead &amp; Safety Engineer</div>
+          <div class="research-org">Fall 2024</div>
+          <div class="research-hint">Click to read more</div>
+          <div class="research-desc">
+            Designed a conceptual planetary lander to meet specified mission constraints
+            while ensuring tolerance to impact forces under varying landing conditions.
+            Served as Safety Engineer and Assembly, Test, and Launch Operations Lead,
+            overseeing procedures to maintain system safety, reliability, and mission
+            readiness. Conducted analytical assessments to determine appropriate mass,
+            volume, and dimensional parameters for a stable landing profile, and performed
+            pre-launch tests and simulations to validate functional performance and
+            structural integrity.
+          </div>
+        </div>
+
+        <!-- Card 6: EPICS -->
+        <div class="research-card reveal" onclick="toggleCard(this)">
+          <div class="research-icon">🌱</div>
+          <span class="research-tag">ASU · EPICS</span>
+          <div class="research-title">Vietnam Smart Agriculture Project</div>
+          <div class="research-role">Documentation Lead</div>
+          <div class="research-org">Fall 2022</div>
+          <div class="research-hint">Click to read more</div>
+          <div class="research-desc">
+            Designed a pH sensor model for soil monitoring with Arduino-based data
+            collection. Led documentation and software development for real-time
+            irrigation data in a 7-member international project. Collaborated to develop
+            a team scope, divide effort, and ensure timely completion aligned with
+            project goals.
+          </div>
+        </div>
+
       </div>
     </div>
+  </section>
 
-  </aside>
 
-</div><!-- /shell -->
+  <!-- ============================================================
+       SKILLS
+  ============================================================ -->
+  <section id="skills">
+    <div class="section-inner">
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<script>
+      <div class="section-header reveal">
+        <span class="section-tag">04 — Technical Skills</span>
+        <div class="section-line"></div>
+      </div>
 
-  /* =============================================================
-     SIMULATION ENGINE
-     Replicates Python files exactly:
-       config.py · spacecraft.py · lifecycle.py
-       fdir.py · schedular.py
-  ============================================================= */
+      <div class="skills-layout">
 
-  /* ── config.py ─────────────────────────────────────────────── */
-  const CFG = {
-    SATELLITE_NAME:           'AETHER-1',
-    MISSION_ID:               'AX-2024-001',
-    ORBIT_ALTITUDE_KM:        550,
-    BATTERY_MAX:              100,
-    BATTERY_MIN:              0,
-    BATTERY_CAPACITY_WH:      20,
-    POWER_LOW_THRESHOLD:      20,
-    POWER_CRITICAL_THRESHOLD: 10,
-    POWER_RECOVER_THRESHOLD:  40,
-    SOLAR_CHARGE_RATE:        1.8,
-    PAYLOAD_DRAIN_RATE:       2.0,
-    IDLE_DRAIN_RATE:          0.4,
-    TEMP_MAX:                 80,
-    TEMP_MIN:                -20,
-    TEMP_FAULT_HIGH:          50,
-    TEMP_FAULT_LOW:          -15,
-    TEMP_RECOVER_HIGH:        40,
-    TEMP_RECOVER_LOW:         -5,
-    TEMP_SUNLIGHT_GAIN:        2.0,
-    TEMP_SHADOW_LOSS:          1.5,
-    TEMP_PAYLOAD_GAIN:         1.5,
-    ORBIT_PERIOD_STEPS:       48,
-    SUNLIGHT_FRACTION:         0.65,
-  };
+        <div class="skill-group reveal">
+          <div class="skill-group-title">Modeling &amp; Design</div>
+          <div class="skill-tags">
+            <span class="skill-tag">SolidWorks</span>
+            <span class="skill-tag">NX Siemens</span>
+            <span class="skill-tag">AutoCAD</span>
+            <span class="skill-tag">TinkerCAD</span>
+            <span class="skill-tag">GD&amp;T</span>
+          </div>
+        </div>
 
-  /* ── FAULT_DEFS (fdir.py) ───────────────────────────────────── */
-  const FAULT_DEFS = {
-    LOW_BATTERY:      { sub:'EPS',     sev:'warning',  desc:'Battery below minimum threshold' },
-    CRITICAL_BATTERY: { sub:'EPS',     sev:'critical', desc:'Imminent power loss – emergency action' },
-    HIGH_TEMP:        { sub:'THERMAL', sev:'warning',  desc:'Temperature exceeding safe operating range' },
-    LOW_TEMP:         { sub:'THERMAL', sev:'warning',  desc:'Temperature below cold survival limit' },
-    ATTITUDE_FAULT:   { sub:'ADCS',    sev:'warning',  desc:'Pointing error exceeds 1.5°' },
-    COMMS_DEGRADED:   { sub:'COMMS',   sev:'caution',  desc:'Downlink quality below threshold' },
-  };
+        <div class="skill-group reveal">
+          <div class="skill-group-title">Simulation &amp; Analysis</div>
+          <div class="skill-tags">
+            <span class="skill-tag">MATLAB</span>
+            <span class="skill-tag">Python</span>
+            <span class="skill-tag">Excel (Data Analytics)</span>
+            <span class="skill-tag">ANSYS</span>
+          </div>
+        </div>
 
-  /* ── Spacecraft state (spacecraft.py) ───────────────────────── */
-  function makeSC() {
-    return {
-      mode:               'NOMINAL',
-      battery:            85.0,
-      solarArrayActive:   true,
-      powerDrawW:         0,
-      temperature:        22.0,
-      heaterOn:           false,
-      payloadOn:          true,
-      payloadDutyCycle:   1.0,
-      attitudeStable:     true,
-      pointingErrorDeg:   0.3,
-      inGroundContact:    true,
-      commsAvailable:     true,
-      linkQuality:        92.0,
-      uplinkPackets:      0,
-      downlinkPackets:    0,
-      orbitStep:          0,
-      inSunlight:         true,
-      eclipseDuration:    0,
-      orbitNumber:        1,
-      activeFaults:       new Set(),
-      preFaultPayloadState: null,
-      history: { battery:[], temperature:[], linkQuality:[], pointingError:[] },
-      totalSteps:   0,
-      totalFaults:  0,
-      uptimeSteps:  0,
-    };
-  }
+        <div class="skill-group reveal">
+          <div class="skill-group-title">Programming &amp; Systems</div>
+          <div class="skill-tags">
+            <span class="skill-tag">Java</span>
+            <span class="skill-tag">Arduino IDE</span>
+            <span class="skill-tag">Embedded Systems</span>
+          </div>
+        </div>
 
-  /* ── update_orbit (spacecraft.py) ───────────────────────────── */
-  function updateOrbit(sc) {
-    sc.orbitStep = (sc.orbitStep + 1) % CFG.ORBIT_PERIOD_STEPS;
-    const phase   = sc.orbitStep / CFG.ORBIT_PERIOD_STEPS;
-    const prevSun = sc.inSunlight;
+        <div class="skill-group reveal">
+          <div class="skill-group-title">Verification Tools</div>
+          <div class="skill-tags">
+            <span class="skill-tag">DOORS</span>
+            <span class="skill-tag">JAMA</span>
+            <span class="skill-tag">JIRA</span>
+            <span class="skill-tag">Confluence</span>
+            <span class="skill-tag">Integrate</span>
+          </div>
+        </div>
 
-    sc.inSunlight = phase < CFG.SUNLIGHT_FRACTION;
+        <div class="skill-group reveal">
+          <div class="skill-group-title">Hardware &amp; Prototyping</div>
+          <div class="skill-tags">
+            <span class="skill-tag">Soldering</span>
+            <span class="skill-tag">PCB Fabrication</span>
+            <span class="skill-tag">Sensor Integration</span>
+            <span class="skill-tag">Heat-Shrink</span>
+          </div>
+        </div>
 
-    sc.eclipseDuration = sc.inSunlight ? 0 : sc.eclipseDuration + 1;
+        <div class="skill-group reveal">
+          <div class="skill-group-title">Domain Knowledge</div>
+          <div class="skill-tags">
+            <span class="skill-tag">DO-178B Certified</span>
+            <span class="skill-tag">Aeroacoustics</span>
+            <span class="skill-tag">SGP4 Propagation</span>
+            <span class="skill-tag">NASA SE Principles</span>
+            <span class="skill-tag">FDIR Logic</span>
+          </div>
+        </div>
 
-    if (sc.orbitStep === 0) sc.orbitNumber += 1;
+      </div>
+    </div>
+  </section>
 
-    sc.inGroundContact = phase < 0.20 || (phase > 0.55 && phase < 0.65);
 
-    return prevSun !== sc.inSunlight;   /* true on day/night transition */
-  }
+  <!-- ============================================================
+       PERSONAL PROJECTS — click to expand description
+  ============================================================ -->
+  <section id="projects">
+    <div class="section-inner">
 
-  /* ── lifecycle update (lifecycle.py) ────────────────────────── */
-  function lifecycleUpdate(sc) {
-    sc.totalSteps += 1;
-    if (sc.mode === 'NOMINAL') sc.uptimeSteps += 1;
+      <div class="section-header reveal">
+        <span class="section-tag">05 — Personal Projects</span>
+        <div class="section-line"></div>
+      </div>
 
-    const transition = updateOrbit(sc);
+      <div class="projects-grid">
 
-    /* Power model */
-    let drain = CFG.IDLE_DRAIN_RATE;
-    if (sc.payloadOn) drain += CFG.PAYLOAD_DRAIN_RATE * sc.payloadDutyCycle;
-    if (sc.heaterOn)  drain += 0.3;
+        <!-- Project 01: Satellite Tracker -->
+        <div class="project-card reveal" onclick="toggleProject(this)">
+          <div class="project-num">01</div>
+          <div class="project-title">3D Real-Time Satellite Orbit Tracking System</div>
+          <div class="project-period">Fall 2025</div>
+          <div class="project-hint">Click to read more</div>
+          <div class="project-desc">
+            Built a real-time satellite tracking system fetching live TLE data and
+            implementing SGP4 orbit propagation to compute satellite position and velocity.
+            Originally built with a FastAPI Python backend; refactored for the web using
+            satellite.js so it runs entirely in the browser. Generates telemetry-style
+            outputs including latitude, longitude, altitude, and velocity for real-time
+            orbital state estimation. The live demo is embedded at the top of this page —
+            use the "View in New Screen" link to open the full interactive experience.
+          </div>
+        </div>
 
-    let solar = 0;
-    if (sc.inSunlight && sc.solarArrayActive) {
-      solar = CFG.SOLAR_CHARGE_RATE;
-      if (transition) solar *= 0.5;
+        <!-- Project 02: CubeSat FDIR -->
+        <div class="project-card reveal" onclick="toggleProject(this)">
+          <div class="project-num">02</div>
+          <div class="project-title">CubeSat Simulation with FDIR Logic</div>
+          <div class="project-period">Spring 2026</div>
+          <div class="project-hint">Click to read more</div>
+          <div class="project-desc">
+            Developed a CubeSat simulation system integrating orbital tracking with
+            simulated spacecraft telemetry and operational states. Implemented
+            Fault Detection, Isolation, and Recovery (FDIR) logic to autonomously
+            identify anomalies, isolate subsystem faults, and simulate recovery actions —
+            reducing reliance on manual ground intervention. Built in Python with a
+            backend architecture for simulating spacecraft health monitoring, anomaly
+            propagation, and automated recovery workflows.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       LEADERSHIP & OUTREACH
+  ============================================================ -->
+  <section id="leadership">
+    <div class="section-inner">
+
+      <div class="section-header reveal">
+        <span class="section-tag">06 — Leadership &amp; Outreach</span>
+        <div class="section-line"></div>
+      </div>
+
+      <div class="leadership-list">
+
+        <div class="lead-item reveal">
+          <div class="lead-line"></div>
+          <div>
+            <div class="lead-role">Grader / Teaching Assistant — FSE 100</div>
+            <div class="lead-org">Arizona State University</div>
+            <div class="lead-desc">
+              Led instructional sessions on basic circuits, programming, and hands-on
+              Arduino electronics. Graded assignments and held regular office hours to
+              assist students with problem-solving and project development.
+            </div>
+          </div>
+          <div class="lead-period">Spring 2026</div>
+        </div>
+
+        <div class="lead-item reveal">
+          <div class="lead-line"></div>
+          <div>
+            <div class="lead-role">SPARKS Ambassador</div>
+            <div class="lead-org">Access ASU</div>
+            <div class="lead-desc">
+              Mentored K-12 students on college readiness and STEM career pathways
+              through interactive outreach programs. Shared personal aerospace
+              experiences to inspire interest in engineering and higher education.
+            </div>
+          </div>
+          <div class="lead-period">Spring – Summer 2025</div>
+        </div>
+
+        <div class="lead-item reveal">
+          <div class="lead-line"></div>
+          <div>
+            <div class="lead-role">Community Assistant</div>
+            <div class="lead-org">Hassayampa Academic Village · ASU</div>
+            <div class="lead-desc">
+              Created inclusive residential communities supporting 200+ students.
+              Organized campus events promoting engagement, mentorship, and collaboration.
+              Led orientation and housing tours for 15,000+ incoming students.
+            </div>
+          </div>
+          <div class="lead-period">Spring 2022 – Spring 2024</div>
+        </div>
+
+        <div class="lead-item reveal">
+          <div class="lead-line"></div>
+          <div>
+            <div class="lead-role">Gold Guide</div>
+            <div class="lead-org">Arizona State University · Tempe</div>
+            <div class="lead-desc">
+              Managed welcome experience for 15,000+ incoming students. Answered
+              student queries via Salesforce, conducted campus and housing tours
+              for freshmen.
+            </div>
+          </div>
+          <div class="lead-period">Spring 2022 – Spring 2023</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       CONTACT
+  ============================================================ -->
+  <section id="contact">
+    <div class="contact-inner">
+      <div class="reveal">
+
+        <h2 class="contact-heading">
+          Let's <span class="stroke">Connect</span>
+        </h2>
+
+        <p class="contact-sub">
+          Graduating May 2026 and open to full-time aerospace engineering roles,
+          research collaborations, and exciting opportunities in space systems,
+          avionics, or acoustics.
+        </p>
+
+        <div class="contact-links">
+          <a href="/cdn-cgi/l/email-protection#adc6ccd8df83c5ccdfc7c2d9839c9b9f9cedcac0ccc4c183cec2c0" class="contact-link">
+            <span class="icon">✉</span> <span class="__cf_email__" data-cfemail="8be3e0eafef9b8b8cbeaf8fea5eeeffe">[email&#160;protected]</span>
+          </a>
+          <a href="https://www.linkedin.com/in/harjottkaurr/" target="_blank" class="contact-link">
+            <span class="icon">🔗</span> LinkedIn
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       FOOTER
+  ============================================================ -->
+  <footer>
+    <p>© <span class="footer-accent">Harjot Kaur</span> — Aerospace Engineer</p>
+    <p>Arizona State University · Tempe, AZ</p>
+  </footer>
+
+
+  <!-- ============================================================
+       JAVASCRIPT
+  ============================================================ -->
+  <script>
+
+    /* ── Custom cursor ──
+       Uses left/top positioning (not transform) so it never freezes
+    ── */
+    const cursor = document.getElementById('cursor');
+    const ring   = document.getElementById('cursorRing');
+    let mx = -100, my = -100, rx = -100, ry = -100;
+
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX;
+      my = e.clientY;
+    });
+
+    function animCursor() {
+      cursor.style.left = (mx - 5) + 'px';
+      cursor.style.top  = (my - 5) + 'px';
+      rx += (mx - rx) * 0.12;
+      ry += (my - ry) * 0.12;
+      ring.style.left = (rx - 18) + 'px';
+      ring.style.top  = (ry - 18) + 'px';
+      requestAnimationFrame(animCursor);
     }
+    animCursor();
 
-    sc.battery = Math.max(CFG.BATTERY_MIN,
-                 Math.min(CFG.BATTERY_MAX, sc.battery + solar - drain));
-    sc.powerDrawW = drain * (CFG.BATTERY_CAPACITY_WH / 100) * 60;
+    /* ring grows when hovering links */
+    document.querySelectorAll('a, button').forEach(el => {
+      el.addEventListener('mouseenter', () => { ring.style.opacity = '0.9'; });
+      el.addEventListener('mouseleave', () => { ring.style.opacity = '0.5'; });
+    });
 
-    /* Thermal model */
-    if (sc.inSunlight) {
-      sc.temperature += CFG.TEMP_SUNLIGHT_GAIN;
-      if (sc.payloadOn) sc.temperature += CFG.TEMP_PAYLOAD_GAIN * sc.payloadDutyCycle;
-    } else {
-      sc.temperature -= CFG.TEMP_SHADOW_LOSS;
-      if (sc.eclipseDuration > 6) sc.temperature -= 0.5;
-    }
 
-    if (sc.heaterOn) sc.temperature += 1.2;
+    /* ── Research card toggle ──
+       Clicking a card adds/removes the "open" class.
+       CSS handles the smooth expand/collapse animation.
+    ── */
+    function toggleCard(card) {
+      const isOpen = card.classList.contains('open');
+      const hint   = card.querySelector('.research-hint');
 
-    /* ±0.2°C thermal noise */
-    sc.temperature += (Math.random() - 0.5) * 0.4;
-    sc.temperature = Math.max(CFG.TEMP_MIN, Math.min(CFG.TEMP_MAX, sc.temperature));
-
-    /* ADCS drift */
-    let drift = (Math.random() - 0.2) * 0.07;
-    if (!sc.inSunlight) drift += 0.03;
-    sc.pointingErrorDeg = Math.max(0, Math.min(5, sc.pointingErrorDeg + drift));
-    sc.attitudeStable   = sc.pointingErrorDeg < 1.0;
-
-    /* Comms model */
-    if (sc.inGroundContact) {
-      const base = 95 - (sc.pointingErrorDeg * 5);
-      sc.linkQuality = Math.max(20, Math.min(100, base + (Math.random() - 0.5) * 4));
-      if (sc.mode !== 'NOMINAL') sc.linkQuality *= 0.85;
-      if (sc.linkQuality > 60) {
-        sc.downlinkPackets += Math.floor(Math.random() * 5);
-        sc.uplinkPackets   += Math.floor(Math.random() * 3);
+      if (isOpen) {
+        card.classList.remove('open');
+        hint.textContent = 'Click to read more';
+      } else {
+        card.classList.add('open');
+        hint.textContent = 'Click to collapse';
       }
-    } else {
-      sc.linkQuality = Math.max(0, sc.linkQuality - 5);
     }
 
-    /* History (keep last 50) */
-    for (const [k, v] of [
-      ['battery', sc.battery],
-      ['temperature', sc.temperature],
-      ['linkQuality', sc.linkQuality],
-      ['pointingError', sc.pointingErrorDeg],
-    ]) {
-      sc.history[k].push(parseFloat(v.toFixed(2)));
-      if (sc.history[k].length > 50) sc.history[k].shift();
-    }
-  }
 
-  /* ── detect_faults (fdir.py) ────────────────────────────────── */
-  function detectFaults(sc) {
-    const faults = [];
+    /* ── Project card toggle ──
+       Same pattern as research cards but for project-hint
+    ── */
+    function toggleProject(card) {
+      const isOpen = card.classList.contains('open');
+      const hint   = card.querySelector('.project-hint');
 
-    function check(cond, key) {
-      if (cond && !sc.activeFaults.has(key)) {
-        faults.push({ type:key, ...FAULT_DEFS[key] });
-        sc.activeFaults.add(key);
+      if (isOpen) {
+        card.classList.remove('open');
+        hint.textContent = 'Click to read more';
+      } else {
+        card.classList.add('open');
+        hint.textContent = 'Click to collapse';
       }
     }
 
-    check(sc.battery < CFG.POWER_CRITICAL_THRESHOLD,                                 'CRITICAL_BATTERY');
-    check(sc.battery >= CFG.POWER_CRITICAL_THRESHOLD &&
-          sc.battery <  CFG.POWER_LOW_THRESHOLD,                                      'LOW_BATTERY');
-    check(sc.temperature > CFG.TEMP_FAULT_HIGH,                                       'HIGH_TEMP');
-    check(sc.temperature < CFG.TEMP_FAULT_LOW,                                        'LOW_TEMP');
-    check(sc.pointingErrorDeg > 1.5,                                                  'ATTITUDE_FAULT');
-    check(sc.inGroundContact && sc.linkQuality < 50,                                  'COMMS_DEGRADED');
 
-    if (faults.length) sc.totalFaults += faults.length;
-    return faults;
-  }
+    /* ── Star field ── */
+    const canvas = document.getElementById('stars');
+    const ctx    = canvas.getContext('2d');
+    let W, H, stars = [];
 
-  /* ── isolate_faults (fdir.py) ───────────────────────────────── */
-  function isolateFaults(sc, faults) {
-    const actions = [];
-    const sevs    = new Set(faults.map(f => f.sev));
-
-    for (const f of faults) {
-      if (['LOW_BATTERY','CRITICAL_BATTERY','HIGH_TEMP'].includes(f.type)) {
-        if (!actions.includes('PAYLOAD_OFF')) actions.push('PAYLOAD_OFF');
-      }
-      if (f.type === 'LOW_TEMP')       actions.push('ENABLE_HEATER');
-      if (f.type === 'ATTITUDE_FAULT') actions.push('STABILISE_ATTITUDE');
+    function resize() {
+      W = canvas.width  = window.innerWidth;
+      H = canvas.height = window.innerHeight;
     }
+    resize();
+    window.addEventListener('resize', resize);
 
-    if (sevs.has('critical')) {
-      actions.push('ENTER_EMERGENCY');
-    } else if (sevs.has('warning')) {
-      if (!actions.includes('ENTER_SAFE_MODE')) actions.push('ENTER_SAFE_MODE');
-    }
+    /* ─────────────────────────────────────────────
+       STAR SYSTEM — three layers for depth:
+         Layer 0 (tiny)   — 220 distant dust stars
+         Layer 1 (medium) — 80  mid-field stars
+         Layer 2 (large)  — 25  bright foreground stars
+                             8  special "sparkle" stars
+       Each star has: position, radius, phase, speed,
+       layer, and a parallax multiplier.
+    ───────────────────────────────────────────── */
 
-    return actions;
-  }
+    /* Brown/warm palette — stays on-brand */
+    const STAR_COLORS = [
+      '139, 69, 19',   /* saddle brown  */
+      '160, 82, 45',   /* sienna        */
+      '205, 133, 63',  /* tan / warm    */
+      '180, 110, 60',  /* mid brown     */
+      '210, 160, 100', /* light warm    */
+    ];
 
-  /* ── recover_faults (fdir.py) ───────────────────────────────── */
-  function recoverFaults(sc, faults) {
-    const actions = [];
-    for (const f of faults) {
-      if (['LOW_BATTERY','CRITICAL_BATTERY'].includes(f.type)) actions.push('ENABLE_CHARGING');
-      if (f.type === 'HIGH_TEMP') actions.push('REDUCE_THERMAL_LOAD');
-      if (f.type === 'LOW_TEMP')  actions.push('ENABLE_HEATER');
-    }
-    return actions;
-  }
+    /* Seed the three layers */
+    function seedStars() {
+      stars = [];
 
-  /* ── recovery_complete (fdir.py) ────────────────────────────── */
-  function recoveryComplete(sc) {
-    const resolved = new Set();
-    if (sc.activeFaults.has('CRITICAL_BATTERY') && sc.battery > CFG.POWER_LOW_THRESHOLD)
-      resolved.add('CRITICAL_BATTERY');
-    if (sc.activeFaults.has('LOW_BATTERY') && sc.battery > CFG.POWER_RECOVER_THRESHOLD)
-      resolved.add('LOW_BATTERY');
-    if (sc.activeFaults.has('HIGH_TEMP') && sc.temperature < CFG.TEMP_RECOVER_HIGH)
-      resolved.add('HIGH_TEMP');
-    if (sc.activeFaults.has('LOW_TEMP') && sc.temperature > CFG.TEMP_RECOVER_LOW)
-      resolved.add('LOW_TEMP');
-    if (sc.activeFaults.has('ATTITUDE_FAULT') && sc.pointingErrorDeg < 0.8)
-      resolved.add('ATTITUDE_FAULT');
-    if (sc.activeFaults.has('COMMS_DEGRADED') && sc.linkQuality > 65)
-      resolved.add('COMMS_DEGRADED');
-    return resolved;
-  }
-
-  /* ── execute command (spacecraft.py) ────────────────────────── */
-  function execute(sc, cmd) {
-    switch (cmd) {
-      case 'ENTER_SAFE_MODE':
-        sc.mode = 'SAFE';
-        if (sc.preFaultPayloadState === null) sc.preFaultPayloadState = sc.payloadOn;
-        sc.payloadOn = false;
-        break;
-      case 'EXIT_SAFE_MODE':    sc.mode = 'NOMINAL'; break;
-      case 'ENTER_EMERGENCY':
-        sc.mode = 'EMERGENCY';
-        if (sc.preFaultPayloadState === null) sc.preFaultPayloadState = sc.payloadOn;
-        sc.payloadOn = false;
-        break;
-      case 'EXIT_EMERGENCY':    sc.mode = 'NOMINAL'; break;
-      case 'PAYLOAD_OFF':       sc.payloadOn = false; break;
-      case 'PAYLOAD_ON':        sc.payloadOn = true;  break;
-      case 'ENABLE_CHARGING':
-        if (sc.inSunlight && sc.solarArrayActive)
-          sc.battery = Math.min(CFG.BATTERY_MAX, sc.battery + 8);
-        break;
-      case 'ENABLE_HEATER':     sc.heaterOn = true;  break;
-      case 'DISABLE_HEATER':    sc.heaterOn = false; break;
-      case 'REDUCE_THERMAL_LOAD':
-        sc.temperature = Math.max(CFG.TEMP_MIN, sc.temperature - 5);
-        break;
-      case 'STABILISE_ATTITUDE':
-        sc.pointingErrorDeg = Math.max(0.1, sc.pointingErrorDeg * 0.5);
-        break;
-    }
-  }
-
-  /* ── schedule (schedular.py) ────────────────────────────────── */
-  function schedule(sc) {
-    const cmds = [];
-    if (sc.mode === 'NOMINAL') {
-      if (sc.battery > 60 && sc.inSunlight &&
-          sc.temperature > CFG.TEMP_FAULT_LOW && sc.temperature < CFG.TEMP_FAULT_HIGH) {
-        cmds.push('PAYLOAD_ON');
-      } else if (sc.battery < CFG.POWER_LOW_THRESHOLD ||
-                 sc.temperature >= CFG.TEMP_FAULT_HIGH) {
-        cmds.push('PAYLOAD_OFF');
-      }
-      if (sc.temperature < -8) cmds.push('ENABLE_HEATER');
-    }
-    return cmds;
-  }
-
-
-  /* =============================================================
-     SIMULATION LOOP
-  ============================================================= */
-  let sc          = makeSC();
-  let stepCounter = 0;
-  let eventLog    = [{ step:0, kind:'NOMINAL', detail:'Simulation initialised — JS engine active' }];
-  let simInterval = null;
-  let simSpeed    = 1500;
-  let metSeconds  = 0;
-
-  function logEvent(step, kind, detail) {
-    eventLog.push({ step, kind, detail });
-    if (eventLog.length > 100) eventLog.shift();
-  }
-
-  function simStep() {
-    stepCounter += 1;
-    metSeconds  += 60;
-
-    lifecycleUpdate(sc);
-
-    /* Scheduler */
-    for (const c of schedule(sc)) execute(sc, c);
-
-    /* FDIR — detect */
-    const faults = detectFaults(sc);
-    for (const f of faults) {
-      logEvent(stepCounter, 'FAULT', `${f.type} [${f.sub}] ${f.sev.toUpperCase()}`);
-    }
-
-    /* FDIR — isolate + recover */
-    if (faults.length) {
-      const isoActions = isolateFaults(sc, faults);
-      for (const a of isoActions) execute(sc, a);
-
-      const recActions = recoverFaults(sc, faults);
-      for (const a of recActions) execute(sc, a);
-    }
-
-    /* FDIR — resolution check */
-    if (sc.mode === 'SAFE' || sc.mode === 'EMERGENCY') {
-      const resolved = recoveryComplete(sc);
-      for (const r of resolved) {
-        sc.activeFaults.delete(r);
-        logEvent(stepCounter, 'RESOLVED', r);
+      /* Layer 0 — tiny distant stars */
+      for (let i = 0; i < 220; i++) {
+        stars.push({
+          x:          Math.random(),   /* 0–1 normalized */
+          y:          Math.random(),
+          r:          Math.random() * 0.8 + 0.3,
+          phase:      Math.random() * Math.PI * 2,
+          speed:      Math.random() * 0.4 + 0.15,
+          layer:      0,
+          parallax:   0.02,
+          color:      STAR_COLORS[Math.floor(Math.random() * STAR_COLORS.length)],
+          maxOpacity: Math.random() * 0.22 + 0.08,
+        });
       }
 
-      if (sc.activeFaults.size === 0) {
-        execute(sc, 'EXIT_SAFE_MODE');
-        execute(sc, 'EXIT_EMERGENCY');
+      /* Layer 1 — medium stars */
+      for (let i = 0; i < 80; i++) {
+        stars.push({
+          x:          Math.random(),
+          y:          Math.random(),
+          r:          Math.random() * 1.2 + 0.8,
+          phase:      Math.random() * Math.PI * 2,
+          speed:      Math.random() * 0.3 + 0.1,
+          layer:      1,
+          parallax:   0.06,
+          color:      STAR_COLORS[Math.floor(Math.random() * STAR_COLORS.length)],
+          maxOpacity: Math.random() * 0.35 + 0.15,
+        });
+      }
 
-        if (sc.preFaultPayloadState) {
-          if (sc.battery > 40 &&
-              sc.temperature > CFG.TEMP_FAULT_LOW &&
-              sc.temperature < CFG.TEMP_FAULT_HIGH &&
-              sc.inSunlight) {
-            execute(sc, 'PAYLOAD_ON');
-            logEvent(stepCounter, 'RECOVERY', 'Payload restored to ON');
-          }
+      /* Layer 2 — bright foreground stars with glow */
+      for (let i = 0; i < 25; i++) {
+        stars.push({
+          x:          Math.random(),
+          y:          Math.random(),
+          r:          Math.random() * 2.0 + 1.5,
+          phase:      Math.random() * Math.PI * 2,
+          speed:      Math.random() * 0.25 + 0.08,
+          layer:      2,
+          parallax:   0.12,
+          color:      STAR_COLORS[Math.floor(Math.random() * STAR_COLORS.length)],
+          maxOpacity: Math.random() * 0.5 + 0.3,
+          glow:       true,
+        });
+      }
+
+      /* Special sparkle stars — cross/starburst shape */
+      for (let i = 0; i < 8; i++) {
+        stars.push({
+          x:          Math.random(),
+          y:          Math.random(),
+          r:          Math.random() * 1.5 + 2.0,
+          phase:      Math.random() * Math.PI * 2,
+          speed:      Math.random() * 0.2 + 0.06,
+          layer:      2,
+          parallax:   0.12,
+          color:      '205, 133, 63',  /* always tan — brightest */
+          maxOpacity: Math.random() * 0.4 + 0.45,
+          glow:       true,
+          sparkle:    true,
+        });
+      }
+    }
+
+    seedStars();
+
+    /* How far the page has scrolled — updated on scroll */
+    let scrollY = 0;
+    window.addEventListener('scroll', () => { scrollY = window.scrollY; }, { passive: true });
+
+    /* Draw a 4-point starburst / cross for sparkle stars */
+    function drawSparkle(cx, cy, r, opacity, color) {
+      const arms = 4;
+      ctx.save();
+      ctx.globalAlpha = opacity;
+      for (let i = 0; i < arms; i++) {
+        const angle = (i / arms) * Math.PI;
+        const len   = r * 4.5;
+        const grad  = ctx.createLinearGradient(
+          cx - Math.cos(angle) * len, cy - Math.sin(angle) * len,
+          cx + Math.cos(angle) * len, cy + Math.sin(angle) * len
+        );
+        grad.addColorStop(0,   `rgba(${color}, 0)`);
+        grad.addColorStop(0.4, `rgba(${color}, ${opacity * 0.6})`);
+        grad.addColorStop(0.5, `rgba(${color}, ${opacity})`);
+        grad.addColorStop(0.6, `rgba(${color}, ${opacity * 0.6})`);
+        grad.addColorStop(1,   `rgba(${color}, 0)`);
+        ctx.strokeStyle = grad;
+        ctx.lineWidth   = r * 0.7;
+        ctx.lineCap     = 'round';
+        ctx.beginPath();
+        ctx.moveTo(cx - Math.cos(angle) * len, cy - Math.sin(angle) * len);
+        ctx.lineTo(cx + Math.cos(angle) * len, cy + Math.sin(angle) * len);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    /* Draw a glowing star with soft radial halo */
+    function drawGlow(cx, cy, r, opacity, color) {
+      const halo = ctx.createRadialGradient(cx, cy, 0, cx, cy, r * 5);
+      halo.addColorStop(0,   `rgba(${color}, ${opacity})`);
+      halo.addColorStop(0.3, `rgba(${color}, ${opacity * 0.5})`);
+      halo.addColorStop(1,   `rgba(${color}, 0)`);
+      ctx.beginPath();
+      ctx.arc(cx, cy, r * 5, 0, Math.PI * 2);
+      ctx.fillStyle = halo;
+      ctx.fill();
+    }
+
+    function drawStars() {
+      ctx.clearRect(0, 0, W, H);
+
+      stars.forEach(s => {
+        /* Advance the twinkle phase */
+        s.phase += s.speed * 0.006;
+
+        /* Smooth sine-wave opacity — natural twinkle */
+        const t       = (Math.sin(s.phase) + 1) / 2;   /* 0 → 1 */
+        const opacity = t * s.maxOpacity;
+
+        /* Parallax: deeper layers scroll less */
+        const parallaxOffset = scrollY * s.parallax;
+
+        /* Convert 0–1 normalized positions to pixels */
+        const px = s.x * W;
+        const py = ((s.y * (H + 600) + parallaxOffset) % (H + 600)) - 300;
+
+        if (opacity < 0.005) return; /* skip invisible stars */
+
+        if (s.sparkle) {
+          /* Starburst cross */
+          drawSparkle(px, py, s.r, opacity, s.color);
+          /* Also draw a small solid core */
+          ctx.beginPath();
+          ctx.arc(px, py, s.r * 0.6, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${s.color}, ${opacity})`;
+          ctx.fill();
+
+        } else if (s.glow) {
+          /* Soft glowing halo + solid core */
+          drawGlow(px, py, s.r, opacity * 0.45, s.color);
+          ctx.beginPath();
+          ctx.arc(px, py, s.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${s.color}, ${opacity})`;
+          ctx.fill();
+
+        } else {
+          /* Plain small star */
+          ctx.beginPath();
+          ctx.arc(px, py, s.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${s.color}, ${opacity})`;
+          ctx.fill();
         }
-        sc.preFaultPayloadState = null;
-        logEvent(stepCounter, 'NOMINAL', 'Spacecraft returned to NOMINAL');
-      }
+      });
+
+      requestAnimationFrame(drawStars);
     }
 
-    /* Orbit transition log */
-    if (sc.orbitStep === 1) {
-      logEvent(stepCounter, 'ORBIT', `Orbit #${sc.orbitNumber} started`);
-    }
-
-    updateUI();
-  }
-
-  function startLoop() {
-    if (simInterval) clearInterval(simInterval);
-    simInterval = setInterval(simStep, simSpeed);
-  }
-
-  function setSpeed(ms, btn) {
-    simSpeed = ms;
-    document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
-    if (btn) btn.classList.add('active');
-    startLoop();
-  }
-
-  function sendCmd(cmd) {
-    execute(sc, cmd);
-    logEvent(stepCounter, 'COMMAND', cmd);
-    updateUI();
-  }
-
-  function resetSim() {
-    sc          = makeSC();
-    stepCounter = 0;
-    metSeconds  = 0;
-    eventLog    = [{ step:0, kind:'NOMINAL', detail:'Simulation reset' }];
-
-    /* Clear chart data */
-    chartBattery.data.labels   = [];
-    chartBattery.data.datasets[0].data = [];
-    chartTemp.data.labels      = [];
-    chartTemp.data.datasets[0].data = [];
-    chartLink.data.labels      = [];
-    chartLink.data.datasets[0].data = [];
-    chartBattery.update();
-    chartTemp.update();
-    chartLink.update();
-
-    updateUI();
-  }
+    drawStars();
 
 
-  /* =============================================================
-     CHARTS  (Chart.js)
-  ============================================================= */
-  function makeChart(id, color, yMin, yMax, unit) {
-    const ctx = document.getElementById(id).getContext('2d');
-    return new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: [],
-        datasets: [{
-          data: [],
-          borderColor: color,
-          borderWidth: 1.5,
-          pointRadius: 0,
-          fill: true,
-          backgroundColor: color + '18',
-          tension: 0.35,
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        animation: { duration: 200 },
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            callbacks: { label: c => `${c.parsed.y.toFixed(1)} ${unit}` }
-          }
-        },
-        scales: {
-          x: { display: false, grid: { display: false } },
-          y: {
-            min: yMin, max: yMax,
-            ticks: {
-              font: { family: 'IBM Plex Mono', size: 10 },
-              color: '#8896A8',
-              maxTicksLimit: 4,
-            },
-            grid: { color: '#DDE1E9', lineWidth: 0.5 }
-          }
-        }
+    /* ── Scroll reveal ──
+       Show elements already in viewport on page load,
+       then watch the rest as the user scrolls.
+    ── */
+    const reveals = document.querySelectorAll('.reveal');
+
+    reveals.forEach(r => {
+      if (r.getBoundingClientRect().top < window.innerHeight) {
+        r.classList.add('visible');
       }
     });
-  }
 
-  const chartBattery = makeChart('chart-battery', '#F59E0B',   0, 100, '%');
-  const chartTemp    = makeChart('chart-temp',    '#EF4444', -20,  80, '°C');
-  const chartLink    = makeChart('chart-link',    '#3B82F6',   0, 100, '%');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => entry.target.classList.add('visible'), i * 60);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.05 });
 
-  function pushChart(chart, value) {
-    chart.data.labels.push('');
-    chart.data.datasets[0].data.push(value);
-    if (chart.data.labels.length > 50) {
-      chart.data.labels.shift();
-      chart.data.datasets[0].data.shift();
-    }
-    chart.update();
-  }
+    reveals.forEach(r => {
+      if (!r.classList.contains('visible')) {
+        observer.observe(r);
+      }
+    });
 
+  </script>
 
-  /* =============================================================
-     UI UPDATE
-  ============================================================= */
-  function setStatus(id, dotClass, label) {
-    document.getElementById(id).innerHTML =
-      `<div class="dot ${dotClass}"></div><span>${label}</span>`;
-  }
-
-  function setModeBadge(mode) {
-    const badge = document.getElementById('mode-badge');
-    badge.className = 'mode-badge ' + mode.toLowerCase();
-    document.getElementById('mode-text').textContent = mode;
-  }
-
-  function updateUI() {
-    /* Header */
-    document.getElementById('step-label').textContent =
-      'STEP ' + String(stepCounter).padStart(4, '0');
-    setModeBadge(sc.mode);
-
-    /* Sidebar — battery */
-    document.getElementById('sb-battery').textContent = sc.battery.toFixed(1);
-    document.getElementById('sb-power').textContent   = sc.powerDrawW.toFixed(2);
-    const bBar = document.getElementById('sb-battery-bar');
-    bBar.style.width      = sc.battery + '%';
-    bBar.style.background = sc.battery < 10 ? '#EF4444' :
-                            sc.battery < 20 ? '#F59E0B' : '#10B981';
-
-    /* Sidebar — temperature */
-    document.getElementById('sb-temp').textContent = sc.temperature.toFixed(1);
-    const tPct = ((sc.temperature + 20) / 100) * 100;
-    const tBar = document.getElementById('sb-temp-bar');
-    tBar.style.width      = Math.max(0, Math.min(100, tPct)) + '%';
-    tBar.style.background = sc.temperature > 45 ? '#EF4444' :
-                            sc.temperature < -10 ? '#3B82F6' : '#F59E0B';
-
-    /* Sidebar — orbit */
-    document.getElementById('sb-orbit').textContent = '#' + sc.orbitNumber;
-
-    /* Subsystem status indicators */
-    const battOk  = sc.battery >= CFG.POWER_LOW_THRESHOLD;
-    const tempOk  = sc.temperature > CFG.TEMP_FAULT_LOW && sc.temperature < CFG.TEMP_FAULT_HIGH;
-    const commsOk = sc.linkQuality > 50 || !sc.inGroundContact;
-
-    setStatus('st-eps',     battOk ? 'green' : 'red',   battOk ? 'Nominal' : 'Fault');
-    setStatus('st-thermal', tempOk ? 'green' : 'red',   tempOk ? 'Nominal' : 'Fault');
-    setStatus('st-adcs',    sc.attitudeStable ? 'green' : 'amber',
-                            sc.attitudeStable ? 'Nominal' : 'Unstable');
-    setStatus('st-comms',   sc.inGroundContact ? (commsOk ? 'green' : 'amber') : 'grey',
-                            sc.inGroundContact ? (commsOk ? 'Acquired' : 'Degraded') : 'Out of range');
-    setStatus('st-payload', sc.payloadOn ? 'green' : 'grey',
-                            sc.payloadOn ? 'Active' : 'Off');
-    setStatus('st-sun',     sc.inSunlight ? 'green' : 'grey',
-                            sc.inSunlight ? 'Illuminated' : 'Eclipse');
-    setStatus('st-ground',  sc.inGroundContact ? 'green' : 'grey',
-                            sc.inGroundContact ? 'Acquired' : 'Out of range');
-
-    /* Metric cards */
-    document.getElementById('m-battery').innerHTML =
-      `${sc.battery.toFixed(1)}<span style="font-size:16px">%</span>`;
-    document.getElementById('m-temp').innerHTML =
-      `${sc.temperature.toFixed(1)}<span style="font-size:16px">°C</span>`;
-    document.getElementById('m-link').innerHTML =
-      `${sc.linkQuality.toFixed(0)}<span style="font-size:16px">%</span>`;
-    document.getElementById('m-point').innerHTML =
-      `${sc.pointingErrorDeg.toFixed(2)}<span style="font-size:14px">°</span>`;
-
-    document.getElementById('m-solar-status').textContent =
-      (sc.inSunlight && sc.solarArrayActive) ? 'Solar charging active' : 'Eclipse — battery draining';
-    document.getElementById('m-heater-status').textContent =
-      sc.heaterOn ? 'Heater active' : 'Heater off';
-    document.getElementById('m-packets').textContent =
-      `↑${sc.uplinkPackets}  ↓${sc.downlinkPackets} packets`;
-    document.getElementById('m-adcs-status').textContent =
-      sc.attitudeStable ? 'Attitude stable' : 'Attitude unstable';
-
-    /* Charts */
-    pushChart(chartBattery, sc.battery);
-    pushChart(chartTemp,    sc.temperature);
-    pushChart(chartLink,    sc.linkQuality);
-
-    document.getElementById('chart-bat-latest').textContent  = sc.battery.toFixed(1) + '%';
-    document.getElementById('chart-temp-latest').textContent = sc.temperature.toFixed(1) + ' °C';
-    document.getElementById('chart-link-latest').textContent = sc.linkQuality.toFixed(0) + '%';
-
-    /* Orbit visualisation */
-    updateOrbitVis();
-
-    document.getElementById('orb-num').textContent =
-      sc.orbitNumber;
-    document.getElementById('orb-eclipse').textContent =
-      sc.inSunlight ? '—' : `${sc.eclipseDuration} step${sc.eclipseDuration !== 1 ? 's' : ''}`;
-
-    /* Active faults */
-    renderFaults();
-
-    /* Event log */
-    renderEventLog();
-  }
-
-  /* ── Orbit SVG ──────────────────────────────────────────────── */
-  function updateOrbitVis() {
-    const R  = 44;
-    const cx = 60;
-    const cy = 60;
-    const STEPS = CFG.ORBIT_PERIOD_STEPS;
-    const SUN   = CFG.SUNLIGHT_FRACTION;
-
-    /* Spacecraft position */
-    const angle = (sc.orbitStep / STEPS) * 2 * Math.PI - Math.PI / 2;
-    const sx    = cx + R * Math.cos(angle);
-    const sy    = cy + R * Math.sin(angle);
-    document.getElementById('sat-pos').setAttribute('transform',
-      `translate(${sx.toFixed(1)},${sy.toFixed(1)})`);
-
-    /* Arc helper */
-    function arcD(startFrac, endFrac) {
-      const a1 = startFrac * 2 * Math.PI - Math.PI / 2;
-      const a2 = endFrac   * 2 * Math.PI - Math.PI / 2;
-      const x1 = (cx + R * Math.cos(a1)).toFixed(2);
-      const y1 = (cy + R * Math.sin(a1)).toFixed(2);
-      const x2 = (cx + R * Math.cos(a2)).toFixed(2);
-      const y2 = (cy + R * Math.sin(a2)).toFixed(2);
-      const lg = (endFrac - startFrac) > 0.5 ? 1 : 0;
-      return `M ${x1} ${y1} A ${R} ${R} 0 ${lg} 1 ${x2} ${y2}`;
-    }
-
-    document.getElementById('sun-arc').setAttribute('d', arcD(0,   SUN));
-    document.getElementById('ecl-arc').setAttribute('d', arcD(SUN, 1));
-  }
-
-  /* ── Fault list ─────────────────────────────────────────────── */
-  function renderFaults() {
-    const list = document.getElementById('fault-list');
-
-    if (sc.activeFaults.size === 0) {
-      list.innerHTML =
-        `<div class="no-faults"><div class="dot green"></div>All systems nominal</div>`;
-      return;
-    }
-
-    list.innerHTML = [...sc.activeFaults].map(ft => {
-      const d = FAULT_DEFS[ft] || { sub:'UNK', sev:'warning', desc:'' };
-      return `
-        <div class="fault-item ${d.sev}">
-          <div style="flex:1">
-            <div class="fault-severity ${d.sev}">${d.sev}</div>
-            <div class="fault-type">${ft}</div>
-            <div class="fault-desc">${d.desc}</div>
-          </div>
-          <div class="fault-sub">${d.sub}</div>
-        </div>`;
-    }).join('');
-  }
-
-  /* ── Event log ──────────────────────────────────────────────── */
-  function renderEventLog() {
-    const el = document.getElementById('event-log');
-    el.innerHTML = [...eventLog].reverse().slice(0, 20).map(e => `
-      <div class="event-item">
-        <span class="event-step">${String(e.step).padStart(4,'0')}</span>
-        <span class="event-kind ${e.kind}">${e.kind}</span>
-        <span class="event-detail">${e.detail}</span>
-      </div>`).join('');
-  }
-
-  /* ── UTC Clock ──────────────────────────────────────────────── */
-  function tickClock() {
-    const n = new Date();
-    const h = String(n.getUTCHours()).padStart(2,'0');
-    const m = String(n.getUTCMinutes()).padStart(2,'0');
-    const s = String(n.getUTCSeconds()).padStart(2,'0');
-    document.getElementById('clock').textContent = `${h}:${m}:${s} UTC`;
-  }
-  setInterval(tickClock, 1000);
-  tickClock();
-
-  /* ── Start ──────────────────────────────────────────────────── */
-  updateUI();
-  startLoop();
-
-</script>
 </body>
 </html>
